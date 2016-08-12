@@ -1,11 +1,9 @@
-package com.ubirch.backend.storage.server.services
+package com.ubirch.backend.services
 
-import akka.actor.{ActorSystem, Props}
+import com.roundeights.hasher.Hash
 import com.typesafe.scalalogging.LazyLogging
-import com.ubirch.backend.storage.actors.HasherService
 import com.ubirch.backend.config.Config
-import com.ubirch.backend.storage.config.ServerConfig
-import com.ubirch.backend.storage.util.JsonUtil
+import com.ubirch.backend.util.JsonUtil
 import org.eclipse.paho.client.mqttv3._
 
 object PullerService extends MqttCallback with LazyLogging {
@@ -16,8 +14,8 @@ object PullerService extends MqttCallback with LazyLogging {
   private var myClient: MqttClient = null
   private var connOpt: MqttConnectOptions = null
 
-  implicit val system = ActorSystem()
-  val hasherServiceActor = system.actorOf(Props[HasherService], name = ServerConfig.hasherServiceActor)
+  //  implicit val system = ActorSystem()
+  //  val hasherServiceActor = system.actorOf(Props[HasherService], name = ServerConfig.hasherServiceActor)
 
   def connectionLost(t: Throwable) {
     logger.debug("Connection lost!")
@@ -28,13 +26,12 @@ object PullerService extends MqttCallback with LazyLogging {
     logger.debug(s"Topic: $topic Message: ${message.toString}")
     try {
       val payload = message.toString
-      val jval = JsonUtil.string2ToHash(payload) match {
+      val jval = JsonUtil.string2Any[Hash](payload) match {
         case Some(th) =>
-          hasherServiceActor ! th
+        //hasherServiceActor ! th
         case None =>
           logger.error("got invalide message")
       }
-
     }
     catch {
       case e: Throwable =>

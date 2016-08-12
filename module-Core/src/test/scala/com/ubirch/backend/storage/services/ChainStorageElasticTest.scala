@@ -3,7 +3,7 @@ package com.ubirch.backend.storage.services
 import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.util.UUIDUtil
 import com.roundeights.hasher.Implicits._
-import com.ubirch.backend.chain.json.{BlockInfo, GenesisBlock, Hash}
+import com.ubirch.backend.chain.model.{BlockInfo, GenesisBlock, Hash}
 import org.joda.time.DateTime
 import org.scalatest.{FeatureSpec, Matchers}
 

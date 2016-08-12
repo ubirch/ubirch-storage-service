@@ -8,9 +8,9 @@ import akka.http.scaladsl.Http.ServerBinding
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import com.typesafe.scalalogging.LazyLogging
+import com.ubirch.backend.services.PullerService
 import com.ubirch.backend.storage.config.ServerConfig
 import com.ubirch.backend.storage.server.route.MainRoute
-import com.ubirch.backend.storage.server.services.PullerService
 
 import scala.concurrent.Future
 
@@ -23,9 +23,6 @@ object Boot extends App with LazyLogging {
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = system.dispatcher
-
-  logger.info("ubirchStorageService started")
-  PullerService.runClient()
 
   val bindingFuture = start()
 
@@ -44,7 +41,5 @@ object Boot extends App with LazyLogging {
     implicit val timeout = Timeout(5, TimeUnit.SECONDS)
 
     Http().bindAndHandle((new MainRoute).myRoute, interface, port)
-
   }
-
 }

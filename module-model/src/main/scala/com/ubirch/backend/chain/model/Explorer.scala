@@ -1,7 +1,7 @@
 /**
   *
   */
-package com.ubirch.backend.chain.json
+package com.ubirch.backend.chain.model
 
 import org.joda.time.DateTime
 
@@ -45,9 +45,9 @@ sealed trait AnchoredBlock {
 
 /**
   *
-  * @param hash
-  * @param created
-  * @param version
+  * @param hash    hash value of the GenesisBlock
+  * @param created creation date
+  * @param version version of the cas class
   */
 case class GenesisBlock(
                          override val hash: String,

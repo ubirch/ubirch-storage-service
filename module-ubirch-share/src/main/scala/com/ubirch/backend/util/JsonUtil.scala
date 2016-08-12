@@ -44,13 +44,9 @@ object JsonUtil {
     }
   }
 
-  //TODO fix this method
-  //  def string2Any[T](implicit m: Manifest[Binding[T]], value: String): Option[T] = {
-  //    string2JValue(value) match {
-  //      case Some(value) =>
-  //        value.extractOpt[T]
-  //      case None =>
-  //        None
-  //    }
-  //  }
+
+  //  TODO fix this methodt
+  def string2Any[T: Manifest](value: String): Option[T] = {
+    parse(value).extractOpt[T]
+  }
 }

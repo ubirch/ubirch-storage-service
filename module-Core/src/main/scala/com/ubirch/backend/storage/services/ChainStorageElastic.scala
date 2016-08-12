@@ -1,19 +1,15 @@
 package com.ubirch.backend.storage.services
 
-import java.net.URI
-
 import com.typesafe.scalalogging.LazyLogging
-import com.ubirch.backend.chain.json._
+import com.ubirch.backend.chain.model._
+import com.ubirch.backend.storage.config.ServerConfig
 import com.ubirch.backend.storage.services.elasticsearch.KeyValueStorage
 import com.ubirch.backend.storage.services.elasticsearch.components.ElasticSearchKeyValueStorage
-import com.ubirch.backend.storage.config.ServerConfig
-
 import com.ubirch.backend.util.JsonUtil
-
 import org.json4s.{DefaultFormats, JValue}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by derMicha on 05/08/16.
@@ -28,7 +24,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param hash the hash to store
     */
   override def storeHash(hash: String): Future[Option[String]] = {
-    JsonUtil.any2jvalue(Hash(hash = hash)) match {
+    JsonUtil.any2jvalue(com.ubirch.backend.chain.model.Hash(hash = hash)) match {
       case Some(hashJval) =>
         HashStore.store(hash, hashJval).map { r =>
           Some(hash)
@@ -42,7 +38,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
   def getHash(hash: String): Future[Option[String]] = {
     HashStore.fetch(hash).map {
       case Some(hJval) =>
-        hJval.extractOpt[Hash] match {
+        hJval.extractOpt[com.ubirch.backend.chain.model.Hash] match {
           case Some(hObj) =>
             Some(hObj.hash)
           case None =>

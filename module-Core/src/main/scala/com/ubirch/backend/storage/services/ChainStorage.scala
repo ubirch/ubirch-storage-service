@@ -1,10 +1,9 @@
 package com.ubirch.backend.storage.services
 
 import com.typesafe.scalalogging.LazyLogging
-import com.ubirch.backend.chain.json._
+import com.ubirch.backend.chain.model._
 
 import scala.concurrent.Future
-
 
 /**
   * author: cvandrei

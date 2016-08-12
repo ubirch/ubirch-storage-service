@@ -15,12 +15,8 @@ class MainRoute {
 
   val myRoute: Route = {
 
-    pathPrefix("api") {
-      HashRoute.route
-    } ~
-      pathSingleSlash {
-        WelcomeRoute.route
-      }
+    pathSingleSlash {
+      WelcomeRoute.route
+    }
   }
-
 }
