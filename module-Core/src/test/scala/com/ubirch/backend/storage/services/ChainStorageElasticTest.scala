@@ -66,8 +66,8 @@ class ChainStorageElasticTest extends FeatureSpec
       res.isDefined shouldBe true
       res.get.hash shouldBe blockHash.hash
 
-      //      if (cleanUp)
-      //        BlockStore.delete(blockHash.hash)
+      if (cleanUp)
+        BlockStore.delete(blockHash.hash)
     }
 
     scenario("store a GenesisBlock") {
@@ -85,8 +85,8 @@ class ChainStorageElasticTest extends FeatureSpec
       res.isDefined shouldBe true
       res.get.hash shouldBe genesisBlockHash
 
-      //      if (cleanUp)
-      //        GenesisBlockStore.delete(genesisBlockHash)
+      if (cleanUp)
+        GenesisBlockStore.delete(genesisBlockHash)
     }
   }
 }
