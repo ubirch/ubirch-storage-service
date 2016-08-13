@@ -6,13 +6,13 @@ maintainer := "Michael Merz <dermicha@ubirch.com>"
 
 name := "ubirchStorageService"
 
-version := "1.0"
+homepage := Some(url("http://ubirch.com"))
 
 lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.dev.conf")
 
 lazy val commonSettings = Seq(
-  organization := "com.ubirch",
-  version := "0.0.1",
+  organization := "com.ubirch.backend.storage",
+  version := "0.0.1-SNAPSHOT",
   test in assembly := {},
   parallelExecution in ThisBuild := false,
   javaOptions in Test += testConfiguration,
@@ -24,35 +24,36 @@ lazy val commonSettings = Seq(
   )
 )
 
-lazy val moduleServer = (project in file("module-server"))
+lazy val server = (project in file("module-server"))
   .settings(commonSettings: _*)
   .settings(mergeStrategy: _*)
   .settings(libraryDependencies ++= (commonDependencies ++ akkaHttpDependencies))
-  .dependsOn(moduleShare)
-  .dependsOn(moduleCore)
-  .dependsOn(moduleModel)
+  .dependsOn(share)
+  .dependsOn(core)
+  .dependsOn(model)
 
-lazy val moduleClient = (project in file("module-client"))
+lazy val client = (project in file("module-client"))
   .settings(commonSettings: _*)
+  .settings(scmInfo := Some(ScmInfo(url("https://gitlab.com/ubirch/ubirch-hello-world"), "scm:git:git@gitlab.com:ubirch/ubirch-hello-world.git")))
   .settings(libraryDependencies ++= commonDependencies)
-  .dependsOn(moduleShare)
-  .dependsOn(moduleCore)
-  .dependsOn(moduleModel)
+  .dependsOn(share)
+  .dependsOn(core)
+  .dependsOn(model)
 
-lazy val moduleCore = (project in file("module-core"))
+lazy val core = (project in file("module-core"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies)
-  .dependsOn(moduleShare)
-  .dependsOn(moduleModel)
+  .dependsOn(share)
+  .dependsOn(model)
   .dependsOn(moduleUbirchShare)
 
-lazy val moduleShare = (project in file("module-share"))
+lazy val share = (project in file("module-share"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
-  .dependsOn(moduleModel)
+  .dependsOn(model)
   .dependsOn(moduleUbirchShare)
 
-lazy val moduleModel = (project in file("module-model"))
+lazy val model = (project in file("module-model"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
   .dependsOn(moduleUbirchShare)
@@ -69,8 +70,8 @@ val configV = "1.3.0"
 val elasticV = "2.3.5"
 
 resolvers += Resolver.bintrayRepo("rick-beton", "maven")
-resolvers += Resolver.sonatypeRepo("snapshots")
-resolvers += Resolver.sonatypeRepo("releases")
+resolvers += Opts.resolver.sonatypeSnapshots
+resolvers += Opts.resolver.sonatypeReleases
 
 lazy val commonDependencies = Seq(
   //scala
@@ -141,7 +142,7 @@ lazy val apacheHttpDependencies = Seq(
 )
 
 lazy val ubirchUtilsDependencies = Seq(
-  "com.ubirch.util" %% "crypto-util" % "0.1"
+  "com.ubirch.util" %% "crypto" % "0.2-SNAPSHOT"
 )
 
 lazy val mergeStrategy = Seq(

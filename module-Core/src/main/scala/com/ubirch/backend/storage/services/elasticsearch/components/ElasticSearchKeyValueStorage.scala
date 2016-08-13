@@ -87,6 +87,39 @@ trait ElasticSearchKeyValueStorage extends KeyValueStorageComponent[JValue] with
       }
     }
 
+    override def fetchAll(limit: Int = 0): Future[Option[List[JValue]]] = Future {
+
+      val urlExt = if (limit == 0)
+        "_search"
+      else
+        s"_search?size=$limit"
+
+      val cUrl = uri.resolve(urlExt).toURL
+      logger.debug(s"current fetch url: $cUrl")
+      val response = httpClient.get(cUrl)
+
+      response match {
+        case r if !r.status.isSuccess =>
+          logger.error(s"invalid response")
+          None
+        case r =>
+          JsonUtil.string2JValue(r.body.asString) match {
+            case Some(respJval) =>
+              (respJval \ "hits" \ "hits").extractOpt[List[JValue]] match {
+                case Some(r) =>
+                  Some(
+                    r.map { e =>
+                      (e \ "_source").extract[JValue]
+                    })
+                case None => None
+              }
+            case None =>
+              logger.error(s"could not parse response: ${r.body}")
+              None
+          }
+      }
+    }
+
     override def store(key: String, value: JValue): Future[Option[JValue]] = Future {
 
       val valueStr = JsonUtil.jvalue2String(value)

@@ -38,6 +38,14 @@ class KeyValueStorage[T] {
   def fetch(key: String) = storage.fetch(key)
 
   /**
+    * fetches all docs of current index
+    *
+    * @param limit limits the reuslt size, 0 means no limit
+    * @return
+    */
+  def fetchAll(limit: Int = 0) = storage.fetchAll(limit = limit)
+
+  /**
     * Store a data point. It is up to the underlying implementation to extract a timestamp
     * from the data point or use the local timestamp to store the data.
     *
