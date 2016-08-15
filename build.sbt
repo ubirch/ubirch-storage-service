@@ -10,7 +10,7 @@ name := "ubirchStorageService"
 homepage := Some(url("http://ubirch.com"))
 
 resolvers in ThisBuild ++= Seq(
-  Resolver.bintrayRepo("hseeberger", "maven"), // Hasher
+  "RoundEights" at "http://maven.spikemark.net/roundeights", // Hasher
   Resolver.bintrayRepo("rick-beton", "maven"), // BeeClient
   Opts.resolver.sonatypeSnapshots, // ubirch
   Opts.resolver.sonatypeReleases // ubirch
