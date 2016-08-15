@@ -75,7 +75,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
             case None =>
               None
           }
-        }.toList.filter(_.isDefined).map(_.get))
+        }.filter(_.isDefined).map(_.get))
       case None =>
         UnminedHashes(Seq.empty)
     }
@@ -87,7 +87,14 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param eventHash hash based on which we look for the related block
     * @return block matching the input hash
     */
-  override def getBlockByEventHash(eventHash: Hash): Future[Option[BlockInfo]] = ???
+  override def getBlockByEventHash(eventHash: Hash): Future[Option[FullBlock]] = {
+    BlockStore.fetchAll(filter = Some(s"hashes:$eventHash")).map {
+      case Some(jvals: List[JValue]) if jvals.nonEmpty =>
+        jvals.head.extractOpt[FullBlock]
+      case None =>
+        None
+    }
+  }
 
   /**
     * Gives us basic information about a block (without all it's hashes).
@@ -159,6 +166,26 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
         }
       case None =>
         logger.error(s"could not store BlockInfo: $block")
+        Future(None)
+    }
+
+  /**
+    * Saves or updates a block.
+    *
+    * @param fullBlock block info to store
+    */
+  override def upsertFullBlock(fullBlock: FullBlock): Future[Option[FullBlock]] =
+    JsonUtil.any2jvalue(fullBlock) match {
+      case Some(jval) =>
+        BlockStore.store(fullBlock.hash, jval).map {
+          case Some(bi) =>
+            //@TODO add deeper result check
+            Some(fullBlock)
+          case None =>
+            None
+        }
+      case None =>
+        logger.error(s"could not store BlockInfo: $fullBlock")
         Future(None)
     }
 

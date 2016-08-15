@@ -18,7 +18,7 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
   override def storeHash(hash: String): Future[Option[String]] = ChainStorageElastic.storeHash(hash)
 
 
-  override def mostRecentBlock(): Future[Option[BlockInfo]] = ChainStorageElastic.mostRecentBlock
+  override def mostRecentBlock(): Future[Option[BlockInfo]] = ChainStorageElastic.mostRecentBlock()
 
   /**
     * Gives us basic information about a block (without all it's hashes).
@@ -53,11 +53,18 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
   override def upsertBlock(block: BlockInfo): Future[Option[BlockInfo]] = ChainStorageElastic.upsertBlock(block = block)
 
   /**
+    * Saves or updates a block.
+    *
+    * @param fullBlock block info to store
+    */
+  override def upsertFullBlock(fullBlock: FullBlock): Future[Option[FullBlock]] = ChainStorageElastic.upsertFullBlock(fullBlock = fullBlock)
+
+  /**
     * Gives us a list of hashes that haven't been mined yet.
     *
     * @return list of unmined hashes
     */
-  override def unminedHashes(): Future[UnminedHashes] = ChainStorageElastic.unminedHashes
+  override def unminedHashes(): Future[UnminedHashes] = ChainStorageElastic.unminedHashes()
 
   /**
     * @return the genesis block; None if none exists
@@ -77,5 +84,5 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
     * @param eventHash hash based on which we look for the related block
     * @return block matching the input hash
     */
-  override def getBlockByEventHash(eventHash: Hash): Future[Option[BlockInfo]] = ChainStorageElastic.getBlockByEventHash(eventHash = eventHash)
+  override def getBlockByEventHash(eventHash: Hash): Future[Option[FullBlock]] = ChainStorageElastic.getBlockByEventHash(eventHash = eventHash)
 }
