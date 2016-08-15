@@ -98,7 +98,10 @@ lazy val commonDependencies = Seq(
   "com.internetitem" % "logback-elasticsearch-appender" % "1.3",
 
   //Joda DateTime
-  "joda-time" % "joda-time" % "2.9.4"
+  "joda-time" % "joda-time" % "2.9.4",
+
+  //Apache Commons
+  "commons-io" % "commons-io" % "2.4"
 )
 
 lazy val testDependencies = Seq(
