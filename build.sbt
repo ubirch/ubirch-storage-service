@@ -64,7 +64,6 @@ lazy val share = (project in file("module-share"))
 lazy val model = (project in file("module-model"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
-  .dependsOn(moduleUbirchShare)
 
 lazy val moduleUbirchShare = (project in file("module-ubirch-share"))
   .settings(commonSettings: _*)
