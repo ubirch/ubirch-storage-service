@@ -48,7 +48,7 @@ lazy val client = (project in file("module-client"))
   .dependsOn(core)
   .dependsOn(model)
 
-lazy val core = (project in file("module-core"))
+lazy val core = (project in file("module-Core"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies)
   .dependsOn(share)
