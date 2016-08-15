@@ -40,7 +40,7 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
   /**
     * Gives us a block including all it's hashes.
     *
-    * @param hash hash of the requested block
+    * @param blockHash hash of the requested block
     * @return block matching the input hash
     */
   override def getFullBlock(blockHash: String): Future[Option[FullBlock]] = ChainStorageElastic.getFullBlock(blockHash = blockHash)

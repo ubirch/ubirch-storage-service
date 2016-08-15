@@ -12,8 +12,8 @@ homepage := Some(url("http://ubirch.com"))
 resolvers in ThisBuild ++= Seq(
   "RoundEights" at "http://maven.spikemark.net/roundeights", // Hasher
   Resolver.bintrayRepo("rick-beton", "maven"), // BeeClient
-  Opts.resolver.sonatypeSnapshots, // ubirch
-  Opts.resolver.sonatypeReleases // ubirch
+  Opts.resolver.sonatypeSnapshots // ubirch
+  //  Opts.resolver.sonatypeReleases // ubirch
 )
 
 lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.dev.conf")
