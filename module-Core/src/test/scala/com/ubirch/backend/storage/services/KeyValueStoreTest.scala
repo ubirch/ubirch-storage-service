@@ -129,7 +129,7 @@ class KeyValueStoreTest extends FeatureSpec
     }
 
     scenario("fetch all docs with limit ordered") {
-      val allDupis = Await.result(KVStore3.fetchAll(ordedBy = Some("created"), order = "desc"), 10 seconds)
+      val allDupis = Await.result(KVStore3.fetchAll(ordered = Some("created"), order = "desc"), 10 seconds)
 
       allDupis.isDefined shouldBe true
       allDupis.get.size shouldBe dupiIds.size
