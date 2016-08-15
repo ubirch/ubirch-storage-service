@@ -87,28 +87,48 @@ trait ElasticSearchKeyValueStorage extends KeyValueStorageComponent[JValue] with
       }
     }
 
-    override def fetchAll(limit: Int = 0, ordedBy: Option[String] = None, order: String = "asc"): Future[Option[List[JValue]]] = Future {
+    /**
+      *
+      * @param limit     limits the reuslts, 0 means no limit
+      * @param orderedBy valid field name for ordering
+      * @param order     asc|desc, asc is default
+      * @param filter    valid filter expression for filtering, e.g. hash:oPuXzuOUticwd3iFJjc
+      * @return
+      */
+    override def fetchAll(limit: Int = 0, orderedBy: Option[String] = None, order: String = "asc", filter: Option[String]): Future[Option[List[JValue]]] = Future {
 
-      val orderBy = ordedBy match {
+      val f = filter match {
         case Some(f) =>
-          Some(order match {
-            case "asc" =>
-              s"order=$f:asc"
-            case _ =>
-              s"order=$f:desc"
-          })
-        case None => None
+          s"&$f"
+        case None =>
+          ""
       }
 
-      val urlExt = if (limit == 0)
-        if (orderBy.isDefined)
-          s"_search?${orderBy.get}"
-        else
-          "_search"
-      else if (orderBy.isDefined)
-        s"_search?size=$limit&${orderBy.get}"
+      val o = orderedBy match {
+        case Some(f) =>
+          order match {
+            case "asc" =>
+              s"&order=$f:asc"
+            case _ =>
+              s"&order=$f:desc"
+          }
+        case None => ""
+      }
+
+      val l = if (limit > 0)
+        s"&size=$limit"
       else
-        s"_search?size=$limit"
+        ""
+
+      val urlExt = {
+        val ue = s"$l$o$f"
+        if (ue.startsWith("&")) {
+          val fue = ue.replaceFirst("&", "?")
+          s"/_search$fue"
+        }
+        else
+          ""
+      }
 
       val cUrl = uri.resolve(urlExt).toURL
       logger.debug(s"current fetch url: $cUrl")
