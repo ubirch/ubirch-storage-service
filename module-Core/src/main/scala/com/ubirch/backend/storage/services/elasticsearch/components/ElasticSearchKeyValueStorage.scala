@@ -124,10 +124,10 @@ trait ElasticSearchKeyValueStorage extends KeyValueStorageComponent[JValue] with
         val ue = s"$l$o$f"
         if (ue.startsWith("&")) {
           val fue = ue.replaceFirst("&", "?")
-          s"/_search$fue"
+          s"_search$fue"
         }
         else
-          ""
+          "_search"
       }
 
       val cUrl = uri.resolve(urlExt).toURL

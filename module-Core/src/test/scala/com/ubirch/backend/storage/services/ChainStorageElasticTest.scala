@@ -5,9 +5,9 @@ import java.net.URL
 import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.util.UUIDUtil
 import com.roundeights.hasher.Implicits._
-import com.ubirch.backend.chain.model.{BlockInfo, GenesisBlock, Hash}
+import com.ubirch.backend.chain.model.{BlockInfo, FullBlock, GenesisBlock, Hash}
+import org.joda.time.DateTime
 import org.scalatest.{BeforeAndAfterAll, FeatureSpec, Matchers}
-
 import uk.co.bigbeeconsultants.http.HttpClient
 
 import scala.concurrent.Await
@@ -34,6 +34,20 @@ class ChainStorageElasticTest extends FeatureSpec
 
   val genesisBlockHash = UUIDUtil.uuidStr.sha256.hex
 
+  val blockInfo = BlockInfo(
+    hash = blockHash.hash,
+    previousBlockHash = UUIDUtil.uuidStr.sha256.hex
+  )
+
+  val fullBlockHashes = Seq(UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex)
+
+  val fullBlockInfo = FullBlock(
+    hash = blockHash.hash,
+    previousBlockHash = UUIDUtil.uuidStr.sha256.hex,
+    created = DateTime.now,
+    version = "1.0",
+    hashes = Some(fullBlockHashes)
+  )
 
   feature("ChainStoreES") {
 
@@ -83,10 +97,6 @@ class ChainStorageElasticTest extends FeatureSpec
     }
 
     scenario("store a BlockInfo") {
-      val blockInfo = BlockInfo(
-        hash = blockHash.hash,
-        previousBlockHash = UUIDUtil.uuidStr.sha256.hex
-      )
 
       val res = Await.result(ChainStorageElastic.upsertBlock(block = blockInfo), 10 seconds)
       res.isDefined shouldBe true
@@ -101,6 +111,10 @@ class ChainStorageElasticTest extends FeatureSpec
     }
 
     ignore("get BlockInfo by hash") {
+
+      //      val res = Await.result(ChainStorageElastic.getBlockByEventHash(), 10 seconds)
+      //      res.isDefined shouldBe true
+      //      res.get.hash shouldBe blockHash.hash
 
     }
 

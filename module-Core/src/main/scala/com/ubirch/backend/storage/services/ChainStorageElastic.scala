@@ -64,6 +64,8 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @return list of unmined hashes
     */
   override def unminedHashes(): Future[UnminedHashes] = {
+    Thread.sleep(500)
+
     HashStore.fetchAll().map {
       case Some(jvals) =>
         UnminedHashes(jvals.map { jval =>
