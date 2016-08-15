@@ -5,7 +5,7 @@ scalaVersion in ThisBuild := "2.11.8"
 
 maintainer := "Michael Merz <dermicha@ubirch.com>"
 
-name := "ubirchStorageService"
+name := "ubirch-storage-service"
 
 homepage := Some(url("http://ubirch.com"))
 
@@ -32,7 +32,28 @@ lazy val commonSettings = Seq(
   )
 )
 
-lazy val server = (project in file("module-server"))
+lazy val ubirchShare = (project in file("ubirch-share"))
+  .settings(commonSettings: _*)
+  .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependencies ++ hasherDependencies ++ testDependencies)
+
+lazy val model = (project in file("model"))
+  .settings(commonSettings: _*)
+  .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
+
+lazy val share = (project in file("share"))
+  .settings(commonSettings: _*)
+  .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
+  .dependsOn(model)
+  .dependsOn(ubirchShare)
+
+lazy val core = (project in file("core"))
+  .settings(commonSettings: _*)
+  .settings(libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies)
+  .dependsOn(share)
+  .dependsOn(model)
+  .dependsOn(ubirchShare)
+
+lazy val server = (project in file("server"))
   .settings(commonSettings: _*)
   .settings(mergeStrategy: _*)
   .settings(libraryDependencies ++= (commonDependencies ++ akkaHttpDependencies))
@@ -40,34 +61,13 @@ lazy val server = (project in file("module-server"))
   .dependsOn(core)
   .dependsOn(model)
 
-lazy val client = (project in file("module-client"))
+lazy val client = (project in file("client"))
   .settings(commonSettings: _*)
   .settings(scmInfo := Some(ScmInfo(url("https://github.com/ubirch/ubirch-storage-service"), "git@github.com:ubirch/ubirch-storage-service.git")))
   .settings(libraryDependencies ++= commonDependencies)
   .dependsOn(share)
   .dependsOn(core)
   .dependsOn(model)
-
-lazy val core = (project in file("module-Core"))
-  .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies)
-  .dependsOn(share)
-  .dependsOn(model)
-  .dependsOn(moduleUbirchShare)
-
-lazy val share = (project in file("module-share"))
-  .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
-  .dependsOn(model)
-  .dependsOn(moduleUbirchShare)
-
-lazy val model = (project in file("module-model"))
-  .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
-
-lazy val moduleUbirchShare = (project in file("module-ubirch-share"))
-  .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependencies ++ hasherDependencies ++ testDependencies)
 
 val scalaV = "2.11.8"
 val akkaV = "2.4.8"
@@ -78,10 +78,10 @@ val elasticV = "2.3.5"
 
 lazy val commonDependencies = Seq(
   //scala
+  "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
   "org.scala-lang" % "scala-compiler" % scalaV,
   "org.scala-lang" % "scala-library" % scalaV,
   "org.scala-lang" % "scala-reflect" % scalaV,
-  "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
 
   //json4s
   "org.json4s" %% "json4s-core" % json4sV,
@@ -104,7 +104,9 @@ lazy val commonDependencies = Seq(
   "joda-time" % "joda-time" % "2.9.4",
 
   //Apache Commons
-  "commons-io" % "commons-io" % "2.4"
+  "commons-io" % "commons-io" % "2.4",
+  "commons-logging" % "commons-logging" % "1.2"
+
 )
 
 lazy val testDependencies = Seq(
