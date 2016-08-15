@@ -69,6 +69,7 @@ val json4sV = "3.4.0"
 val configV = "1.3.0"
 val elasticV = "2.3.5"
 
+resolvers += Resolver.bintrayRepo("hseeberger", "maven"),
 resolvers += Resolver.bintrayRepo("rick-beton", "maven")
 resolvers += Opts.resolver.sonatypeSnapshots
 resolvers += Opts.resolver.sonatypeReleases
