@@ -34,7 +34,7 @@ lazy val server = (project in file("module-server"))
 
 lazy val client = (project in file("module-client"))
   .settings(commonSettings: _*)
-  .settings(scmInfo := Some(ScmInfo(url("https://gitlab.com/ubirch/ubirch-hello-world"), "scm:git:git@gitlab.com:ubirch/ubirch-hello-world.git")))
+  .settings(scmInfo := Some(ScmInfo(url("https://github.com/ubirch/ubirch-storage-service"), "git@github.com:ubirch/ubirch-storage-service.git")))
   .settings(libraryDependencies ++= commonDependencies)
   .dependsOn(share)
   .dependsOn(core)
