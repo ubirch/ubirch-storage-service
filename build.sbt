@@ -27,6 +27,7 @@ lazy val commonSettings = Seq(
 lazy val server = (project in file("module-server"))
   .settings(commonSettings: _*)
   .settings(mergeStrategy: _*)
+  .settings(resolvers: _*)
   .settings(libraryDependencies ++= (commonDependencies ++ akkaHttpDependencies))
   .dependsOn(share)
   .dependsOn(core)
@@ -35,6 +36,7 @@ lazy val server = (project in file("module-server"))
 lazy val client = (project in file("module-client"))
   .settings(commonSettings: _*)
   .settings(scmInfo := Some(ScmInfo(url("https://github.com/ubirch/ubirch-storage-service"), "git@github.com:ubirch/ubirch-storage-service.git")))
+  .settings(resolvers: _*)
   .settings(libraryDependencies ++= commonDependencies)
   .dependsOn(share)
   .dependsOn(core)
@@ -42,6 +44,7 @@ lazy val client = (project in file("module-client"))
 
 lazy val core = (project in file("module-core"))
   .settings(commonSettings: _*)
+  .settings(resolvers: _*)
   .settings(libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies)
   .dependsOn(share)
   .dependsOn(model)
@@ -49,17 +52,20 @@ lazy val core = (project in file("module-core"))
 
 lazy val share = (project in file("module-share"))
   .settings(commonSettings: _*)
+  .settings(resolvers: _*)
   .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
   .dependsOn(model)
   .dependsOn(moduleUbirchShare)
 
 lazy val model = (project in file("module-model"))
   .settings(commonSettings: _*)
+  .settings(resolvers: _*)
   .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
   .dependsOn(moduleUbirchShare)
 
 lazy val moduleUbirchShare = (project in file("module-ubirch-share"))
   .settings(commonSettings: _*)
+  .settings(resolvers: _*)
   .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependencies ++ hasherDependencies ++ testDependencies)
 
 val scalaV = "2.11.8"
@@ -69,10 +75,10 @@ val json4sV = "3.4.0"
 val configV = "1.3.0"
 val elasticV = "2.3.5"
 
-resolvers += Resolver.bintrayRepo("hseeberger", "maven")
-resolvers += Resolver.bintrayRepo("rick-beton", "maven")
-resolvers += Opts.resolver.sonatypeSnapshots
-resolvers += Opts.resolver.sonatypeReleases
+resolvers += Resolver.bintrayRepo("hseeberger", "maven") // Hasher
+resolvers += Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
+resolvers += Opts.resolver.sonatypeSnapshots // ubirch
+resolvers += Opts.resolver.sonatypeReleases // ubirch
 
 lazy val commonDependencies = Seq(
   //scala
