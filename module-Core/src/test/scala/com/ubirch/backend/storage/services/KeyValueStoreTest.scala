@@ -8,6 +8,7 @@ import com.ubirch.backend.storage.services.elasticsearch._
 import com.ubirch.backend.storage.services.elasticsearch.components.ElasticSearchKeyValueStorage
 import com.ubirch.backend.storage.config.ServerConfig
 import com.ubirch.backend.util.{JsonUtil, UUIDUtil}
+import org.joda.time.DateTime
 import org.json4s._
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FeatureSpec, Matchers}
 import uk.co.bigbeeconsultants.http.HttpClient
@@ -19,7 +20,7 @@ import scala.language.postfixOps
 /**
   * Created by derMicha on 05/08/16.
   */
-case class Dupi(id: String, name: String, wumms: String) {
+case class Dupi(id: String, name: String, wumms: String, created: DateTime = DateTime.now) {
   def asJvalue: JValue = JsonUtil.any2jvalue(this).get
 
   def asJsonString: String = JsonUtil.jvalue2String(asJvalue)
@@ -54,7 +55,7 @@ class KeyValueStoreTest extends FeatureSpec
       Await.result(KVStore2.store(d.id, d.asJvalue), 10 seconds)
       Await.result(KVStore3.store(d.id, d.asJvalue), 10 seconds)
     }
-
+    //@TODO try to remove that ugly sleep
     Thread.sleep(1000)
   }
 
@@ -124,6 +125,16 @@ class KeyValueStoreTest extends FeatureSpec
       allDupis.get.size shouldBe 1
 
       val aDupi = allDupis.get.head.extract[Dupi]
+      dupiIds.contains(aDupi.id) shouldBe true
+    }
+
+    scenario("fetch all docs with limit ordered") {
+      val allDupis = Await.result(KVStore3.fetchAll(ordedBy = Some("created"), order = "desc"), 10 seconds)
+
+      allDupis.isDefined shouldBe true
+      allDupis.get.size shouldBe dupiIds.size
+
+      val aDupi = allDupis.get.take(dupiIds.size).head.extract[Dupi]
       dupiIds.contains(aDupi.id) shouldBe true
     }
   }

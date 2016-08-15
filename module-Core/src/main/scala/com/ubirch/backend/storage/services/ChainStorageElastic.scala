@@ -54,7 +54,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
 
   override def deleteHashes(hashes: Set[String]): Future[Boolean] = {
     hashes.foreach(deleteHash(_))
-    //@TODO fix it
+    //@TODO fix it, return false if one the results are false
     Future(true)
   }
 
@@ -63,7 +63,21 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     *
     * @return list of unmined hashes
     */
-  override def unminedHashes(): UnminedHashes = ???
+  override def unminedHashes(): Future[UnminedHashes] = {
+    HashStore.fetchAll().map {
+      case Some(jvals) =>
+        UnminedHashes(jvals.map { jval =>
+          jval.extractOpt[Hash] match {
+            case Some(hash) =>
+              Some(hash.hash)
+            case None =>
+              None
+          }
+        }.toList.filter(_.isDefined).map(_.get))
+      case None =>
+        UnminedHashes(Seq.empty)
+    }
+  }
 
   /**
     * Gives us the block that the input hash is included in.
@@ -101,7 +115,14 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     }
   }
 
-  override def mostRecentBlock(): BlockInfo = ???
+  override def mostRecentBlock(): Future[Option[BlockInfo]] = {
+    BlockStore.fetchAll(ordedBy = Some("created"), order = "desc").map {
+      case Some(jvals: List[JValue]) if jvals.nonEmpty =>
+        jvals.head.extractOpt[BlockInfo]
+      case None =>
+        None
+    }
+  }
 
   override def saveGenesisBlock(genesis: GenesisBlock): Future[Option[GenesisBlock]] = {
     JsonUtil.any2jvalue(genesis) match {
@@ -152,7 +173,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
 
 }
 
-object HashStore extends KeyValueStorage[JValue] with ElasticSearchKeyValueStorage with LazyLogging {
+private object HashStore extends KeyValueStorage[JValue] with ElasticSearchKeyValueStorage with LazyLogging {
 
   override val baseUrl = ServerConfig.esUrl
 
@@ -163,7 +184,7 @@ object HashStore extends KeyValueStorage[JValue] with ElasticSearchKeyValueStora
   logger.debug(s"current uri: $uri")
 }
 
-object BlockStore extends KeyValueStorage[JValue] with ElasticSearchKeyValueStorage with LazyLogging {
+private object BlockStore extends KeyValueStorage[JValue] with ElasticSearchKeyValueStorage with LazyLogging {
 
   override val baseUrl = ServerConfig.esUrl
 
@@ -174,7 +195,7 @@ object BlockStore extends KeyValueStorage[JValue] with ElasticSearchKeyValueStor
   logger.debug(s"current uri: $uri")
 }
 
-object GenesisBlockStore extends KeyValueStorage[JValue] with ElasticSearchKeyValueStorage with LazyLogging {
+private object GenesisBlockStore extends KeyValueStorage[JValue] with ElasticSearchKeyValueStorage with LazyLogging {
 
   override val baseUrl = ServerConfig.esUrl
 

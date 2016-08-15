@@ -61,7 +61,7 @@ trait ChainStorage extends LazyLogging {
     *
     * @return list of unmined hashes
     */
-  def unminedHashes(): UnminedHashes
+  def unminedHashes(): Future[UnminedHashes]
 
   /**
     * Saves or updates a block.
@@ -70,7 +70,7 @@ trait ChainStorage extends LazyLogging {
     */
   def upsertBlock(block: BlockInfo): Future[Option[BlockInfo]]
 
-  def mostRecentBlock(): BlockInfo
+  def mostRecentBlock(): Future[Option[BlockInfo]]
 
   def saveGenesisBlock(genesis: GenesisBlock): Future[Option[GenesisBlock]]
 

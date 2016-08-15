@@ -87,10 +87,26 @@ trait ElasticSearchKeyValueStorage extends KeyValueStorageComponent[JValue] with
       }
     }
 
-    override def fetchAll(limit: Int = 0): Future[Option[List[JValue]]] = Future {
+    override def fetchAll(limit: Int = 0, ordedBy: Option[String] = None, order: String = "asc"): Future[Option[List[JValue]]] = Future {
+
+      val orderBy = ordedBy match {
+        case Some(f) =>
+          Some(order match {
+            case "asc" =>
+              s"order=$f:asc"
+            case _ =>
+              s"order=$f:desc"
+          })
+        case None => None
+      }
 
       val urlExt = if (limit == 0)
-        "_search"
+        if (orderBy.isDefined)
+          s"_search?${orderBy.get}"
+        else
+          "_search"
+      else if (orderBy.isDefined)
+        s"_search?size=$limit&${orderBy.get}"
       else
         s"_search?size=$limit"
 

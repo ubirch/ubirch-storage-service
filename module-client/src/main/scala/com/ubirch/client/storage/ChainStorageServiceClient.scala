@@ -18,7 +18,7 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
   override def storeHash(hash: String): Future[Option[String]] = ChainStorageElastic.storeHash(hash)
 
 
-  override def mostRecentBlock(): BlockInfo = ChainStorageElastic.mostRecentBlock
+  override def mostRecentBlock(): Future[Option[BlockInfo]] = ChainStorageElastic.mostRecentBlock
 
   /**
     * Gives us basic information about a block (without all it's hashes).
@@ -35,7 +35,7 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
     */
   override def deleteHashes(hashes: Set[String]): Future[Boolean] = ChainStorageElastic.deleteHashes(hashes)
 
-  override def saveGenesisBlock(genesis: GenesisBlock): Future[Option[GenesisBlock]] = ???
+  override def saveGenesisBlock(genesis: GenesisBlock): Future[Option[GenesisBlock]] = ChainStorageElastic.saveGenesisBlock(genesis = genesis)
 
   /**
     * Gives us a block including all it's hashes.
@@ -43,33 +43,33 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
     * @param hash hash of the requested block
     * @return block matching the input hash
     */
-  override def getFullBlock(hash: String): Future[Option[FullBlock]] = ???
+  override def getFullBlock(blockHash: String): Future[Option[FullBlock]] = ChainStorageElastic.getFullBlock(blockHash = blockHash)
 
   /**
     * Saves or updates a block.
     *
     * @param block block info to store
     */
-  override def upsertBlock(block: BlockInfo): Future[Option[BlockInfo]] = ???
+  override def upsertBlock(block: BlockInfo): Future[Option[BlockInfo]] = ChainStorageElastic.upsertBlock(block = block)
 
   /**
     * Gives us a list of hashes that haven't been mined yet.
     *
     * @return list of unmined hashes
     */
-  override def unminedHashes(): UnminedHashes = ???
+  override def unminedHashes(): Future[UnminedHashes] = ChainStorageElastic.unminedHashes
 
   /**
     * @return the genesis block; None if none exists
     */
-  override def getGenesisBlock: Future[Option[GenesisBlock]] = ???
+  override def getGenesisBlock: Future[Option[GenesisBlock]] = ChainStorageElastic.getGenesisBlock
 
   /**
     * deletes a hash from the list of unmined hashes.
     *
     * @param hash the hash to delete
     */
-  override def deleteHash(hash: String): Future[Boolean] = ???
+  override def deleteHash(hash: String): Future[Boolean] = ChainStorageElastic.deleteHash(hash = hash)
 
   /**
     * Gives us the block that the input hash is included in.
@@ -77,5 +77,5 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
     * @param eventHash hash based on which we look for the related block
     * @return block matching the input hash
     */
-  override def getBlockByEventHash(eventHash: Hash): Future[Option[BlockInfo]] = ???
+  override def getBlockByEventHash(eventHash: Hash): Future[Option[BlockInfo]] = ChainStorageElastic.getBlockByEventHash(eventHash = eventHash)
 }
