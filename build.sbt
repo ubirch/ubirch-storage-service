@@ -1,6 +1,8 @@
 import sbt.Keys._
 import sbt.Resolver
 
+packagedArtifacts in file(".") := Map.empty // disable publishing of root/default project
+
 scalaVersion in ThisBuild := "2.11.8"
 
 maintainer := "Michael Merz <dermicha@ubirch.com>"
