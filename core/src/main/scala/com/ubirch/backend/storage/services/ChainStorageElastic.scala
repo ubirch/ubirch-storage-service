@@ -53,7 +53,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
   }
 
   override def deleteHashes(hashes: Set[String]): Future[Boolean] = {
-    hashes.foreach(deleteHash(_))
+    hashes.foreach(deleteHash)
     //@TODO fix it, return false if one the results are false
     Future(true)
   }
