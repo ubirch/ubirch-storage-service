@@ -1,16 +1,16 @@
 package com.ubirch.backend.storage.services
 
-import java.net.{URI, URL}
+import java.net.URL
 
 import com.roundeights.hasher.Implicits._
 import com.typesafe.scalalogging.LazyLogging
+import com.ubirch.backend.storage.config.ServerConfig
 import com.ubirch.backend.storage.services.elasticsearch._
 import com.ubirch.backend.storage.services.elasticsearch.components.ElasticSearchKeyValueStorage
-import com.ubirch.backend.storage.config.ServerConfig
 import com.ubirch.backend.util.{JsonUtil, UUIDUtil}
 import org.joda.time.DateTime
 import org.json4s._
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, FeatureSpec, Matchers}
+import org.scalatest.{BeforeAndAfterAll, FeatureSpec, Matchers}
 import uk.co.bigbeeconsultants.http.HttpClient
 
 import scala.concurrent.Await
