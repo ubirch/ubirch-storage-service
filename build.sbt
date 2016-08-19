@@ -72,9 +72,12 @@ lazy val client = (project in file("client"))
   .dependsOn(core)
   .dependsOn(model)
 
-lazy val testUtil = project
+lazy val testUtil = (project in file("test-util"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= Seq(typesafeLogging) ++ beeHttpDependencies)
+  .settings(
+    name := "test-util",
+    libraryDependencies ++= Seq(typesafeLogging) ++ beeHttpDependencies
+  )
   .dependsOn(share)
 
 val scalaV = "2.11.8"
