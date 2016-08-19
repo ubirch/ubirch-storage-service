@@ -126,8 +126,11 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
 
   override def mostRecentBlock(): Future[Option[BlockInfo]] = {
     BlockStore.fetchAll(ordered = Some("created"), order = "desc").map {
-      case Some(jvals: List[JValue]) if jvals.nonEmpty =>
-        jvals.head.extractOpt[BlockInfo]
+      case Some(jvals: List[JValue]) =>
+        jvals.nonEmpty match {
+          case true => jvals.head.extractOpt[BlockInfo]
+          case false => None
+        }
       case None =>
         None
     }
