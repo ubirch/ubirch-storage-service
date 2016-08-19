@@ -1,14 +1,12 @@
 package com.ubirch.backend.storage.services
 
-import java.net.URL
-
-import com.typesafe.scalalogging.LazyLogging
-import com.ubirch.backend.util.UUIDUtil
 import com.roundeights.hasher.Implicits._
+import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.chain.model.{BlockInfo, FullBlock, GenesisBlock, Hash}
+import com.ubirch.backend.storage.StorageCleanUp
+import com.ubirch.backend.util.UUIDUtil
 import org.joda.time.DateTime
 import org.scalatest.{BeforeAndAfterAll, FeatureSpec, Matchers}
-import uk.co.bigbeeconsultants.http.HttpClient
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -20,11 +18,11 @@ import scala.language.postfixOps
 class ChainStorageElasticTest extends FeatureSpec
   with Matchers
   with BeforeAndAfterAll
-  with LazyLogging {
+  with LazyLogging
+  with StorageCleanUp {
 
   // if cleanUp == true all tests delete their stuff
   val cleanUp = false
-  val httpClient = new HttpClient
 
   val hashValue = UUIDUtil.uuidStr.sha256.hex
 
@@ -153,9 +151,7 @@ class ChainStorageElasticTest extends FeatureSpec
 
   override protected def beforeAll(): Unit = {
     logger.info("start clean up before")
-    httpClient.delete(new URL(s"${HashStore.baseUrl}/${HashStore.index}"))
-    httpClient.delete(new URL(s"${BlockStore.baseUrl}/${BlockStore.index}"))
-    httpClient.delete(new URL(s"${GenesisBlockStore.baseUrl}/${GenesisBlockStore.index}"))
+    resetStorage()
 
     Thread.sleep(500)
 
@@ -168,9 +164,7 @@ class ChainStorageElasticTest extends FeatureSpec
   override protected def afterAll(): Unit = {
     if (cleanUp) {
       logger.info("start clean up after")
-      httpClient.delete(new URL(s"${HashStore.baseUrl}/${HashStore.index}"))
-      httpClient.delete(new URL(s"${BlockStore.baseUrl}/${BlockStore.index}"))
-      httpClient.delete(new URL(s"${GenesisBlockStore.baseUrl}/${GenesisBlockStore.index}"))
+      resetStorage()
     }
   }
 }

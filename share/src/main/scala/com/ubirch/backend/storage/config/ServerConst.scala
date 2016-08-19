@@ -30,4 +30,7 @@ object ServerConst {
   final val ESCHAINGENESISBLOCKINDEX = "ubirchStorageService.elasticsearch.genesisblockchainstore.index"
 
   final val ESCHAINGENESISBLOCKTYPE = "ubirchStorageService.elasticsearch.genesisblockchainstore.type"
+
+  final val ES_ALL_INDEXES: Set[String] = Set(ESCHAINBLOCKINDEX, ESCHAINGENESISBLOCKINDEX, ESCHAINHASHINDEX)
+
 }

@@ -36,7 +36,7 @@ lazy val commonSettings = Seq(
 
 lazy val ubirchShare = (project in file("ubirch-share"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependencies ++ hasherDependencies ++ testDependencies)
+  .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependenciesTest ++ hasherDependencies ++ testDependencies)
 
 lazy val model = (project in file("model"))
   .settings(commonSettings: _*)
@@ -54,11 +54,12 @@ lazy val core = (project in file("core"))
   .dependsOn(share)
   .dependsOn(model)
   .dependsOn(ubirchShare)
+  .dependsOn(testUtil)
 
 lazy val server = (project in file("server"))
   .settings(commonSettings: _*)
   .settings(mergeStrategy: _*)
-  .settings(libraryDependencies ++= (commonDependencies ++ akkaHttpDependencies))
+  .settings(libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies)
   .dependsOn(share)
   .dependsOn(core)
   .dependsOn(model)
@@ -70,6 +71,11 @@ lazy val client = (project in file("client"))
   .dependsOn(share)
   .dependsOn(core)
   .dependsOn(model)
+
+lazy val testUtil = project
+  .settings(commonSettings: _*)
+  .settings(libraryDependencies ++= Seq(typesafeLogging) ++ beeHttpDependencies)
+  .dependsOn(share)
 
 val scalaV = "2.11.8"
 val akkaV = "2.4.8"
@@ -96,7 +102,7 @@ lazy val commonDependencies = Seq(
   "com.typesafe" % "config" % configV,
 
   // logging
-  "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0",
+  typesafeLogging,
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "ch.qos.logback" % "logback-core" % "1.1.3",
   "org.slf4j" % "slf4j-api" % "1.7.12",
@@ -112,7 +118,7 @@ lazy val commonDependencies = Seq(
 )
 
 lazy val testDependencies = Seq(
-  "org.scalatest" %% "scalatest" % scalaTestV
+  "org.scalatest" %% "scalatest" % scalaTestV % "test"
 )
 
 lazy val akkaDependencies = Seq(
@@ -143,9 +149,15 @@ lazy val beeHttpDependencies = Seq(
   "uk.co.bigbeeconsultants" %% "bee-client" % "0.29.1"
 )
 
+lazy val beeHttpDependenciesTest = Seq(
+  "uk.co.bigbeeconsultants" %% "bee-client" % "0.29.1" % "test"
+)
+
 lazy val hasherDependencies = Seq(
   "com.roundeights" %% "hasher" % "1.2.0"
 )
+
+lazy val typesafeLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0"
 
 lazy val apacheHttpDependencies = Seq(
   "org.apache.httpcomponents" % "httpclient" % "4.5.2"

@@ -10,6 +10,7 @@ ubirch generic storage service
       "com.ubirch.backend.storage" %% "core" % "0.0.1-SNAPSHOT"
       "com.ubirch.backend.storage" %% "server" % "0.0.1-SNAPSHOT"
       "com.ubirch.backend.storage" %% "client" % "0.0.1-SNAPSHOT"
+      "com.ubirch.backend.storage" %% "testUtil" % "0.0.1-SNAPSHOT" % "test
     )
 
 ## client usage
