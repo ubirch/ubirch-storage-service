@@ -52,13 +52,13 @@ class ChainStorageElasticTest extends FeatureSpec
     scenario("store a hash") {
       val res = Await.result(ChainStorageElastic.storeHash(hashValue), 10 seconds)
       res.isDefined shouldBe true
-      res.get shouldBe hashValue
+      res.get.hash shouldBe hashValue.hash
     }
 
     scenario("fetch a hash") {
       val fetchedHash = Await.result(ChainStorageElastic.getHash(hashValue.hash), 10 seconds)
       fetchedHash.isDefined shouldBe true
-      fetchedHash.get shouldBe hashValue
+      fetchedHash.get.hash shouldBe hashValue.hash
     }
 
     scenario("delete hashes") {
@@ -66,7 +66,7 @@ class ChainStorageElasticTest extends FeatureSpec
       hashValues.foreach { hash =>
         val hv = Await.result(ChainStorageElastic.getHash(hash), 10 seconds)
         hv.isDefined shouldBe true
-        hv.get shouldBe hash
+        hv.get.hash shouldBe hash
       }
 
       ChainStorageElastic.deleteHashes(hashValues.toSet)
@@ -83,7 +83,7 @@ class ChainStorageElasticTest extends FeatureSpec
       Thread.sleep(500)
       val unminedHashes = Await.result(ChainStorageElastic.unminedHashes(), 10 seconds)
       unminedHashes.hashes.nonEmpty shouldBe true
-      unminedHashes.hashes.head shouldBe hashValue
+      unminedHashes.hashes.head shouldBe hashValue.hash
     }
 
     scenario("delete a hash") {
