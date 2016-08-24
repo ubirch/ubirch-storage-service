@@ -17,17 +17,15 @@
 
 package com.ubirch.backend.storage.services.elasticsearch.components
 
-import java.net.{URI, URL, URLEncoder}
+import java.net.{URI, URL}
 
 import com.typesafe.scalalogging.LazyLogging
-import com.ubirch.backend.util.JsonUtil
-
+import com.ubirch.util.json.Json4sUtil
 import org.json4s.DefaultFormats
 import org.json4s.JsonAST.JValue
-
 import uk.co.bigbeeconsultants.http._
-import uk.co.bigbeeconsultants.http.request.RequestBody
 import uk.co.bigbeeconsultants.http.header.MediaType._
+import uk.co.bigbeeconsultants.http.request.RequestBody
 import uk.co.bigbeeconsultants.http.response.Status._
 
 import scala.concurrent.Future
@@ -77,7 +75,7 @@ trait ElasticSearchKeyValueStorage extends KeyValueStorageComponent[JValue] with
           logger.error(s"invalid response for key: $key")
           None
         case r =>
-          JsonUtil.string2JValue(r.body.asString) match {
+          Json4sUtil.string2JValue(r.body.asString) match {
             case Some(respJval) =>
               Some(respJval)
             case None =>
@@ -139,7 +137,7 @@ trait ElasticSearchKeyValueStorage extends KeyValueStorageComponent[JValue] with
           logger.error(s"invalid response")
           None
         case r =>
-          JsonUtil.string2JValue(r.body.asString) match {
+          Json4sUtil.string2JValue(r.body.asString) match {
             case Some(respJval) =>
               (respJval \ "hits" \ "hits").extractOpt[List[JValue]] match {
                 case Some(r) =>
@@ -158,13 +156,13 @@ trait ElasticSearchKeyValueStorage extends KeyValueStorageComponent[JValue] with
 
     override def store(key: String, value: JValue): Future[Option[JValue]] = Future {
 
-      val valueStr = JsonUtil.jvalue2String(value)
+      val valueStr = Json4sUtil.jvalue2String(value)
       val jsonBody = RequestBody(valueStr, APPLICATION_JSON)
       logger.debug(s"store with key $key: $valueStr")
       val cUrl = uri.resolve(s"$key").toURL
       httpClient.put(cUrl, jsonBody) match {
         case resp if resp.status.isSuccess =>
-          JsonUtil.string2JValue(resp.body.asString) match {
+          Json4sUtil.string2JValue(resp.body.asString) match {
             case Some(respJval) =>
               Some(respJval)
             case None =>

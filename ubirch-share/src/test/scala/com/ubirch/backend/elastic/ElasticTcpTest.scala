@@ -3,9 +3,10 @@ package com.ubirch.backend.elastic
 import java.net.InetAddress
 
 import com.typesafe.scalalogging.LazyLogging
-import com.ubirch.backend.util.{JsonUtil, UUIDUtil}
 import com.roundeights.hasher.Implicits._
 import com.roundeights.hasher.{Digest, Hash}
+import com.ubirch.util.json.Json4sUtil
+import com.ubirch.util.uuid.UUIDUtil
 import org.scalatest.{FeatureSpec, Matchers}
 
 //import org.elasticsearch.client.Client
@@ -38,7 +39,7 @@ import scala.concurrent.duration._
 //      val sup = Supi(name = "Otto", wumms = "humms")
 //      val id = UUIDUtil.uuidStr
 //      info(s"id: $id")
-//      JsonUtil.any2jvalue(sup) match {
+//      Json4sUtil.any2jvalue(sup) match {
 //        case Some(supJObj) =>
 //          val resp = client
 //            .prepareIndex("data", "datum")

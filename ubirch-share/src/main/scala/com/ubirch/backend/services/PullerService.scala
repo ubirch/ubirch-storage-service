@@ -3,7 +3,7 @@ package com.ubirch.backend.services
 import com.roundeights.hasher.Hash
 import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.config.Config
-import com.ubirch.backend.util.JsonUtil
+import com.ubirch.util.json.Json4sUtil
 import org.eclipse.paho.client.mqttv3._
 
 object PullerService extends MqttCallback with LazyLogging {
@@ -26,7 +26,7 @@ object PullerService extends MqttCallback with LazyLogging {
     logger.debug(s"Topic: $topic Message: ${message.toString}")
     try {
       val payload = message.toString
-      val jval = JsonUtil.string2Any[Hash](payload) match {
+      val jval = Json4sUtil.string2Any[Hash](payload) match {
         case Some(th) =>
         //hasherServiceActor ! th
         case None =>

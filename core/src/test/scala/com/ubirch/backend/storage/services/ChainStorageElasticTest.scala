@@ -4,7 +4,7 @@ import com.roundeights.hasher.Implicits._
 import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.chain.model.{BlockInfo, FullBlock, GenesisBlock, HashedData}
 import com.ubirch.backend.storage.StorageCleanUp
-import com.ubirch.backend.util.UUIDUtil
+import com.ubirch.util.uuid.UUIDUtil
 import org.joda.time.DateTime
 import org.scalatest.{BeforeAndAfterAll, FeatureSpec, Matchers}
 

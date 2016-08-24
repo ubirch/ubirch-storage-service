@@ -7,7 +7,8 @@ import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.storage.config.ServerConfig
 import com.ubirch.backend.storage.services.elasticsearch._
 import com.ubirch.backend.storage.services.elasticsearch.components.ElasticSearchKeyValueStorage
-import com.ubirch.backend.util.{JsonUtil, UUIDUtil}
+import com.ubirch.util.json.Json4sUtil
+import com.ubirch.util.uuid.UUIDUtil
 import org.joda.time.DateTime
 import org.json4s._
 import org.scalatest.{BeforeAndAfterAll, FeatureSpec, Matchers}
@@ -21,9 +22,9 @@ import scala.language.postfixOps
   * Created by derMicha on 05/08/16.
   */
 case class Dupi(id: String, name: String, wumms: String, created: DateTime = DateTime.now) {
-  def asJvalue: JValue = JsonUtil.any2jvalue(this).get
+  def asJvalue: JValue = Json4sUtil.any2jvalue(this).get
 
-  def asJsonString: String = JsonUtil.jvalue2String(asJvalue)
+  def asJsonString: String = Json4sUtil.jvalue2String(asJvalue)
 }
 
 class KeyValueStoreTest extends FeatureSpec

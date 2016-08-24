@@ -5,7 +5,7 @@ import com.ubirch.backend.chain.model._
 import com.ubirch.backend.storage.config.ServerConfig
 import com.ubirch.backend.storage.services.elasticsearch.KeyValueStorage
 import com.ubirch.backend.storage.services.elasticsearch.components.ElasticSearchKeyValueStorage
-import com.ubirch.backend.util.JsonUtil
+import com.ubirch.util.json.Json4sUtil
 import org.json4s.{DefaultFormats, JValue}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -24,7 +24,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param hash the hash to store
     */
   override def storeHash(hash: HashedData): Future[Option[HashedData]] = {
-    JsonUtil.any2jvalue(hash) match {
+    Json4sUtil.any2jvalue(hash) match {
       case Some(hashJval) =>
         HashStore.store(hash.hash, hashJval).map { r =>
           Some(hash)
@@ -140,7 +140,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
   }
 
   override def saveGenesisBlock(genesis: GenesisBlock): Future[Option[GenesisBlock]] = {
-    JsonUtil.any2jvalue(genesis) match {
+    Json4sUtil.any2jvalue(genesis) match {
       case Some(genesisJval) =>
         GenesisBlockStore.store("1", genesisJval).map {
           case Some(bi) =>
@@ -161,7 +161,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param block block info to store
     */
   override def upsertBlock(block: BlockInfo): Future[Option[BlockInfo]] =
-    JsonUtil.any2jvalue(block) match {
+    Json4sUtil.any2jvalue(block) match {
       case Some(jval) =>
         BlockStore.store(block.hash, jval).map {
           case Some(bi) =>
@@ -181,7 +181,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param fullBlock block info to store
     */
   override def upsertFullBlock(fullBlock: FullBlock): Future[Option[FullBlock]] =
-    JsonUtil.any2jvalue(fullBlock) match {
+    Json4sUtil.any2jvalue(fullBlock) match {
       case Some(jval) =>
         BlockStore.store(fullBlock.hash, jval).map {
           case Some(bi) =>

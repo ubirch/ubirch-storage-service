@@ -4,7 +4,8 @@ import java.net.URL
 
 import com.roundeights.hasher.Implicits._
 import com.typesafe.scalalogging.LazyLogging
-import com.ubirch.backend.util.{JsonUtil, UUIDUtil}
+import com.ubirch.util.json.Json4sUtil
+import com.ubirch.util.uuid.UUIDUtil
 import org.json4s._
 import org.scalatest.{FeatureSpec, Matchers}
 import uk.co.bigbeeconsultants.http._
@@ -31,8 +32,8 @@ class ElasticHttpTest extends FeatureSpec
 
   val dupiId = UUIDUtil.uuidStr
   val dupi = Dupi(id = dupiId, name = "Susi", wumms = "summs")
-  val dupiJval = JsonUtil.any2jvalue(dupi)
-  val dupiStr = JsonUtil.jvalue2String(dupiJval.get)
+  val dupiJval = Json4sUtil.any2jvalue(dupi)
+  val dupiStr = Json4sUtil.jvalue2String(dupiJval.get)
 
   ignore("Elasticsearch") {
 
@@ -54,7 +55,7 @@ class ElasticHttpTest extends FeatureSpec
       println(response.status)
       println(response.body.asString)
 
-      JsonUtil.string2JValue(response.body.asString) match {
+      Json4sUtil.string2JValue(response.body.asString) match {
         case Some(respJval) =>
           val respDupiId = (respJval \ "_id").extractOpt[String]
           respDupiId.isDefined shouldBe true
@@ -67,7 +68,7 @@ class ElasticHttpTest extends FeatureSpec
     scenario("fetch hash") {
       val httpClient = new HttpClient
       val response = httpClient.get(new URL(s"$esBaseUrl/$dupiId/_source"))
-      JsonUtil.string2JValue(response.body.asString) match {
+      Json4sUtil.string2JValue(response.body.asString) match {
         case Some(respDupiJval) =>
           respDupiJval.extractOpt[Dupi] match {
             case Some(respDupi) =>

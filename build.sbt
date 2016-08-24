@@ -18,7 +18,7 @@ resolvers in ThisBuild ++= Seq(
   //  Opts.resolver.sonatypeReleases // ubirch
 )
 
-lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.dev.conf")
+lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.base.conf")
 
 lazy val commonSettings = Seq(
   organization := "com.ubirch.backend.storage",
@@ -37,7 +37,7 @@ lazy val commonSettings = Seq(
 lazy val ubirchShare = (project in file("ubirch-share"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependenciesTest
-    ++ hasherDependencies ++ json4s ++ testDependencies :+ typesafeConfig)
+    ++ hasherDependencies ++ json4s ++ testDependencies :+ typesafeConfig :+ ubirchUtilUUID :+ ubirchUtilJson)
 
 lazy val model = (project in file("model"))
   .settings(commonSettings: _*)
@@ -60,7 +60,8 @@ lazy val core = (project in file("core"))
 lazy val server = (project in file("server"))
   .settings(commonSettings: _*)
   .settings(mergeStrategy: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies :+ ubirchUtilJsonAutoConvert)
+  .settings(libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies
+    :+ ubirchUtilJsonAutoConvert)
   .dependsOn(share)
   .dependsOn(core)
   .dependsOn(model)
@@ -175,7 +176,9 @@ lazy val ubirchUtilsDependencies = Seq(
   "com.ubirch.util" %% "crypto" % "0.2-SNAPSHOT"
 )
 
+lazy val ubirchUtilJson = "com.ubirch.util" %% "json" % "0.1-SNAPSHOT"
 lazy val ubirchUtilJsonAutoConvert = "com.ubirch.util" %% "json-auto-convert" % "0.1-SNAPSHOT"
+lazy val ubirchUtilUUID = "com.ubirch.util" %% "uuid" % "0.1-SNAPSHOT"
 
 lazy val mergeStrategy = Seq(
   assemblyMergeStrategy in assembly := {
