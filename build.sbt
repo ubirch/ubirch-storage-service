@@ -18,7 +18,7 @@ resolvers in ThisBuild ++= Seq(
   //  Opts.resolver.sonatypeReleases // ubirch
 )
 
-lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.dev.conf")
+lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.base.conf")
 
 lazy val commonSettings = Seq(
   organization := "com.ubirch.backend.storage",
@@ -36,7 +36,8 @@ lazy val commonSettings = Seq(
 
 lazy val ubirchShare = (project in file("ubirch-share"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependenciesTest ++ hasherDependencies ++ testDependencies)
+  .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependenciesTest
+    ++ hasherDependencies ++ json4s ++ testDependencies)
 
 lazy val model = (project in file("model"))
   .settings(commonSettings: _*)
@@ -59,7 +60,7 @@ lazy val core = (project in file("core"))
 lazy val server = (project in file("server"))
   .settings(commonSettings: _*)
   .settings(mergeStrategy: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies)
+  .settings(libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies ++ Seq(ubirchUtilJsonAutoConvert))
   .dependsOn(share)
   .dependsOn(core)
   .dependsOn(model)
@@ -93,13 +94,6 @@ lazy val commonDependencies = Seq(
   "org.scala-lang" % "scala-compiler" % scalaV,
   "org.scala-lang" % "scala-library" % scalaV,
   "org.scala-lang" % "scala-reflect" % scalaV,
-
-  //json4s
-  "org.json4s" %% "json4s-core" % json4sV,
-  "org.json4s" %% "json4s-native" % json4sV,
-  "org.json4s" %% "json4s-ast" % json4sV,
-  "org.json4s" %% "json4s-ext" % json4sV,
-  "org.json4s" %% "json4s-jackson" % json4sV,
 
   // app config
   "com.typesafe" % "config" % configV,
@@ -166,9 +160,22 @@ lazy val apacheHttpDependencies = Seq(
   "org.apache.httpcomponents" % "httpclient" % "4.5.2"
 )
 
+lazy val json4s = Seq(
+  json4sCore,
+  json4sJackson,
+  json4sExt,
+  json4sNative
+)
+lazy val json4sJackson = "org.json4s" %% "json4s-jackson" % json4sV
+lazy val json4sCore = "org.json4s" %% "json4s-core" % json4sV
+lazy val json4sExt = "org.json4s" %% "json4s-ext" % json4sV
+lazy val json4sNative = "org.json4s" %% "json4s-native" % json4sV
+
 lazy val ubirchUtilsDependencies = Seq(
   "com.ubirch.util" %% "crypto" % "0.2-SNAPSHOT"
 )
+
+lazy val ubirchUtilJsonAutoConvert = "com.ubirch.util" %% "json-auto-convert" % "0.1-SNAPSHOT"
 
 lazy val mergeStrategy = Seq(
   assemblyMergeStrategy in assembly := {
