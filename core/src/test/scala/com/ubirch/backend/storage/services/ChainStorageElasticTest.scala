@@ -2,7 +2,7 @@ package com.ubirch.backend.storage.services
 
 import com.roundeights.hasher.Implicits._
 import com.typesafe.scalalogging.LazyLogging
-import com.ubirch.backend.chain.model.{BlockInfo, FullBlock, GenesisBlock, Hash}
+import com.ubirch.backend.chain.model.{BlockInfo, FullBlock, GenesisBlock, HashedData}
 import com.ubirch.backend.storage.StorageCleanUp
 import com.ubirch.backend.util.UUIDUtil
 import org.joda.time.DateTime
@@ -28,7 +28,7 @@ class ChainStorageElasticTest extends FeatureSpec
 
   val hashValues = List(UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex)
 
-  val blockHash: Hash = Hash(hash = UUIDUtil.uuidStr.sha256.hex)
+  val blockHash: HashedData = HashedData(hash = UUIDUtil.uuidStr.sha256.hex)
 
   val genesisBlockHash = UUIDUtil.uuidStr.sha256.hex
 

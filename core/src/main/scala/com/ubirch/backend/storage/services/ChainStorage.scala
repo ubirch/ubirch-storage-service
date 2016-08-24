@@ -38,7 +38,7 @@ trait ChainStorage extends LazyLogging {
     * @param eventHash hash based on which we look for the related block
     * @return block matching the input hash
     */
-  def getBlockByEventHash(eventHash: Hash): Future[Option[FullBlock]]
+  def getBlockByEventHash(eventHash: HashedData): Future[Option[FullBlock]]
 
   /**
     * Gives us basic information about a block (without all it's hashes).
@@ -46,7 +46,7 @@ trait ChainStorage extends LazyLogging {
     * @param blockHash hash of the requested block
     * @return block matching the input hash
     */
-  def getBlockInfo(blockHash: Hash): Future[Option[BlockInfo]]
+  def getBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]]
 
   /**
     * Gives us a block including all it's hashes.

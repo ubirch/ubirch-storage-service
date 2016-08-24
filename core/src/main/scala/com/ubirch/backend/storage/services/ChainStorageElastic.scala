@@ -24,7 +24,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param hash the hash to store
     */
   override def storeHash(hash: String): Future[Option[String]] = {
-    JsonUtil.any2jvalue(com.ubirch.backend.chain.model.Hash(hash = hash)) match {
+    JsonUtil.any2jvalue(com.ubirch.backend.chain.model.HashedData(hash = hash)) match {
       case Some(hashJval) =>
         HashStore.store(hash, hashJval).map { r =>
           Some(hash)
@@ -38,7 +38,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
   def getHash(hash: String): Future[Option[String]] = {
     HashStore.fetch(hash).map {
       case Some(hJval) =>
-        hJval.extractOpt[com.ubirch.backend.chain.model.Hash] match {
+        hJval.extractOpt[com.ubirch.backend.chain.model.HashedData] match {
           case Some(hObj) =>
             Some(hObj.hash)
           case None =>
@@ -69,7 +69,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     HashStore.fetchAll().map {
       case Some(jvals) =>
         UnminedHashes(jvals.map { jval =>
-          jval.extractOpt[Hash] match {
+          jval.extractOpt[HashedData] match {
             case Some(hash) =>
               Some(hash.hash)
             case None =>
@@ -87,7 +87,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param eventHash hash based on which we look for the related block
     * @return block matching the input hash
     */
-  override def getBlockByEventHash(eventHash: Hash): Future[Option[FullBlock]] = {
+  override def getBlockByEventHash(eventHash: HashedData): Future[Option[FullBlock]] = {
     BlockStore.fetchAll(filter = Some(s"hashes:$eventHash")).map {
       case Some(jvals: List[JValue]) if jvals.nonEmpty =>
         jvals.head.extractOpt[FullBlock]
@@ -102,7 +102,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param blockHash hash of the requested block
     * @return block matching the input hash
     */
-  override def getBlockInfo(blockHash: Hash): Future[Option[BlockInfo]] = {
+  override def getBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = {
     BlockStore.fetch(blockHash.hash).map {
       case Some(bJval) =>
         bJval.extractOpt[BlockInfo]
