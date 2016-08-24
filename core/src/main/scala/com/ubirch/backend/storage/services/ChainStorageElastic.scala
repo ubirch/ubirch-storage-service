@@ -23,10 +23,10 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     *
     * @param hash the hash to store
     */
-  override def storeHash(hash: String): Future[Option[String]] = {
-    JsonUtil.any2jvalue(com.ubirch.backend.chain.model.HashedData(hash = hash)) match {
+  override def storeHash(hash: HashedData): Future[Option[HashedData]] = {
+    JsonUtil.any2jvalue(hash) match {
       case Some(hashJval) =>
-        HashStore.store(hash, hashJval).map { r =>
+        HashStore.store(hash.hash, hashJval).map { r =>
           Some(hash)
         }
       case None =>
@@ -35,12 +35,12 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     }
   }
 
-  def getHash(hash: String): Future[Option[String]] = {
+  def getHash(hash: String): Future[Option[HashedData]] = {
     HashStore.fetch(hash).map {
       case Some(hJval) =>
         hJval.extractOpt[com.ubirch.backend.chain.model.HashedData] match {
           case Some(hObj) =>
-            Some(hObj.hash)
+            Some(hObj)
           case None =>
             None
         }

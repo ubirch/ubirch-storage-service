@@ -24,7 +24,7 @@ class ChainStorageElasticTest extends FeatureSpec
   // if cleanUp == true all tests delete their stuff
   val cleanUp = false
 
-  val hashValue = UUIDUtil.uuidStr.sha256.hex
+  val hashValue = HashedData(UUIDUtil.uuidStr.sha256.hex)
 
   val hashValues = List(UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex)
 
@@ -56,7 +56,7 @@ class ChainStorageElasticTest extends FeatureSpec
     }
 
     scenario("fetch a hash") {
-      val fetchedHash = Await.result(ChainStorageElastic.getHash(hashValue), 10 seconds)
+      val fetchedHash = Await.result(ChainStorageElastic.getHash(hashValue.hash), 10 seconds)
       fetchedHash.isDefined shouldBe true
       fetchedHash.get shouldBe hashValue
     }
@@ -87,10 +87,10 @@ class ChainStorageElasticTest extends FeatureSpec
     }
 
     scenario("delete a hash") {
-      val res = Await.result(ChainStorageElastic.deleteHash(hashValue), 10 seconds)
+      val res = Await.result(ChainStorageElastic.deleteHash(hashValue.hash), 10 seconds)
       res shouldBe true
 
-      val fetchedHash = Await.result(ChainStorageElastic.getHash(hashValue), 10 seconds)
+      val fetchedHash = Await.result(ChainStorageElastic.getHash(hashValue.hash), 10 seconds)
       fetchedHash.isDefined shouldBe false
     }
 
@@ -156,7 +156,8 @@ class ChainStorageElasticTest extends FeatureSpec
     Thread.sleep(500)
 
     hashValues.foreach { hv =>
-      Await.result(ChainStorageElastic.storeHash(hv), 10 seconds)
+      val hash = HashedData(hv)
+      Await.result(ChainStorageElastic.storeHash(hash), 10 seconds)
     }
 
   }

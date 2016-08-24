@@ -16,7 +16,7 @@ trait ChainStorage extends LazyLogging {
     *
     * @param hash the hash to store
     */
-  def storeHash(hash: String): Future[Option[String]]
+  def storeHash(hash: HashedData): Future[Option[HashedData]]
 
   /**
     * deletes a hash from the list of unmined hashes.

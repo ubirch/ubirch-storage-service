@@ -15,7 +15,7 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
     *
     * @param hash the hash to store
     */
-  override def storeHash(hash: String): Future[Option[String]] = ChainStorageElastic.storeHash(hash)
+  override def storeHash(hash: HashedData): Future[Option[HashedData]] = ChainStorageElastic.storeHash(hash)
 
 
   override def mostRecentBlock(): Future[Option[BlockInfo]] = ChainStorageElastic.mostRecentBlock()
