@@ -105,8 +105,9 @@ lazy val commonDependencies = Seq(
   "org.slf4j" % "slf4j-api" % "1.7.12",
   "com.internetitem" % "logback-elasticsearch-appender" % "1.3",
 
-  //Joda DateTime
-  "joda-time" % "joda-time" % "2.9.4",
+  //Joda
+  jodaTime,
+  jodaConvert,
 
   //Apache Commons
   "commons-io" % "commons-io" % "2.4",
@@ -170,6 +171,9 @@ lazy val json4sJackson = "org.json4s" %% "json4s-jackson" % json4sV
 lazy val json4sCore = "org.json4s" %% "json4s-core" % json4sV
 lazy val json4sExt = "org.json4s" %% "json4s-ext" % json4sV
 lazy val json4sNative = "org.json4s" %% "json4s-native" % json4sV
+
+lazy val jodaTime = "joda-time" % "joda-time" % "2.9.4"
+lazy val jodaConvert = "org.joda" % "joda-convert" % "1.8"
 
 lazy val ubirchUtilsDependencies = Seq(
   "com.ubirch.util" %% "crypto" % "0.2-SNAPSHOT"
