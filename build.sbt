@@ -18,7 +18,7 @@ resolvers in ThisBuild ++= Seq(
   //  Opts.resolver.sonatypeReleases // ubirch
 )
 
-lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.base.conf")
+lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.dev.conf")
 
 lazy val commonSettings = Seq(
   organization := "com.ubirch.backend.storage",
