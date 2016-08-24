@@ -2,23 +2,15 @@ package com.ubirch.backend.elastic
 
 import java.net.URL
 
+import com.roundeights.hasher.Implicits._
 import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.util.{JsonUtil, UUIDUtil}
-import com.roundeights.hasher.Implicits._
-
-import org.scalatest.{FeatureSpec, Matchers}
-
-import uk.co.bigbeeconsultants.http._
-import uk.co.bigbeeconsultants.http.request.RequestBody
-import uk.co.bigbeeconsultants.http.header.MediaType._
-import uk.co.bigbeeconsultants.http.response.Status._
-
 import org.json4s._
-import org.json4s.JsonDSL._
-import org.json4s.native.JsonMethods._
-
-import scala.concurrent.Await
-import scala.concurrent.duration._
+import org.scalatest.{FeatureSpec, Matchers}
+import uk.co.bigbeeconsultants.http._
+import uk.co.bigbeeconsultants.http.header.MediaType._
+import uk.co.bigbeeconsultants.http.request.RequestBody
+import uk.co.bigbeeconsultants.http.response.Status._
 
 /**
   * Created by derMicha on 05/08/16.
@@ -42,7 +34,7 @@ class ElasticHttpTest extends FeatureSpec
   val dupiJval = JsonUtil.any2jvalue(dupi)
   val dupiStr = JsonUtil.jvalue2String(dupiJval.get)
 
-  feature("Elasticsearch") {
+  ignore("Elasticsearch") {
 
     scenario("test SSL") {
       val url = "https://www.google.de"
