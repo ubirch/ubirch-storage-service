@@ -37,11 +37,11 @@ lazy val commonSettings = Seq(
 lazy val ubirchShare = (project in file("ubirch-share"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependenciesTest
-    ++ hasherDependencies ++ json4s ++ testDependencies)
+    ++ hasherDependencies ++ json4s ++ testDependencies :+ typesafeConfig)
 
 lazy val model = (project in file("model"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
+  .settings(libraryDependencies ++= commonDependencies ++ joda ++ testDependencies)
 
 lazy val share = (project in file("share"))
   .settings(commonSettings: _*)
@@ -95,19 +95,12 @@ lazy val commonDependencies = Seq(
   "org.scala-lang" % "scala-library" % scalaV,
   "org.scala-lang" % "scala-reflect" % scalaV,
 
-  // app config
-  "com.typesafe" % "config" % configV,
-
   // logging
   typesafeLogging,
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "ch.qos.logback" % "logback-core" % "1.1.3",
   "org.slf4j" % "slf4j-api" % "1.7.12",
   "com.internetitem" % "logback-elasticsearch-appender" % "1.3",
-
-  //Joda
-  jodaTime,
-  jodaConvert,
 
   //Apache Commons
   "commons-io" % "commons-io" % "2.4",
@@ -172,8 +165,11 @@ lazy val json4sCore = "org.json4s" %% "json4s-core" % json4sV
 lazy val json4sExt = "org.json4s" %% "json4s-ext" % json4sV
 lazy val json4sNative = "org.json4s" %% "json4s-native" % json4sV
 
+lazy val joda = Seq(jodaTime, jodaConvert)
 lazy val jodaTime = "joda-time" % "joda-time" % "2.9.4"
 lazy val jodaConvert = "org.joda" % "joda-convert" % "1.8"
+
+lazy val typesafeConfig = "com.typesafe" % "config" % configV
 
 lazy val ubirchUtilsDependencies = Seq(
   "com.ubirch.util" %% "crypto" % "0.2-SNAPSHOT"
