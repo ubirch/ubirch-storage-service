@@ -84,5 +84,5 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
     * @param eventHash hash based on which we look for the related block
     * @return block matching the input hash
     */
-  override def getBlockByEventHash(eventHash: HashedData): Future[Option[FullBlock]] = ChainStorageElastic.getBlockByEventHash(eventHash = eventHash)
+  override def getBlockByEventHash(eventHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getBlockByEventHash(eventHash = eventHash)
 }

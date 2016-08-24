@@ -87,10 +87,10 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param eventHash hash based on which we look for the related block
     * @return block matching the input hash
     */
-  override def getBlockByEventHash(eventHash: HashedData): Future[Option[FullBlock]] = {
+  override def getBlockByEventHash(eventHash: HashedData): Future[Option[BlockInfo]] = {
     BlockStore.fetchAll(filter = Some(s"hashes:$eventHash")).map {
       case Some(jvals: List[JValue]) if jvals.nonEmpty =>
-        jvals.head.extractOpt[FullBlock]
+        jvals.head.extractOpt[BlockInfo]
       case None =>
         None
     }
