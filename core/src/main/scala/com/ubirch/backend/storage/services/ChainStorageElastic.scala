@@ -106,6 +106,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @return block matching the input hash
     */
   override def getBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = {
+    // TODO do not ignore genesis block in search
     BlockStore.fetch(blockHash.hash).map {
       case Some(bJval) =>
         bJval.extractOpt[BlockInfo]
@@ -120,6 +121,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @return block matching the input hash
     */
   override def getFullBlock(blockHash: String): Future[Option[FullBlock]] = {
+    // TODO do not ignore genesis block in search
     BlockStore.fetch(blockHash).map {
       case Some(bJval) =>
         bJval.extractOpt[FullBlock]
