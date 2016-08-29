@@ -18,6 +18,7 @@ object ServerConst {
   final val HASH_MD5 = "md5"
 
   final val ESURL = "ubirchStorageService.elasticsearch.url"
+  final val ES_UNMINED_HASHES_LIMIT = "ubirchStorageService.elasticsearch.unminedHashesLimit"
 
   final val ESCHAINHASHINDEX = "ubirchStorageService.elasticsearch.hashchainstore.index"
 

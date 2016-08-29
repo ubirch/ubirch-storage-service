@@ -21,6 +21,7 @@ object ServerConfig {
   val pusherActor = "pusher-actor"
 
   val esUrl = conf.getString(ServerConst.ESURL)
+  val esUnminedHashesLimit = conf.getInt(ServerConst.ES_UNMINED_HASHES_LIMIT)
 
   val esChainHashIndex = conf.getString(ServerConst.ESCHAINHASHINDEX)
   val esChainHashType = conf.getString(ServerConst.ESCHAINHASHTYPE)
