@@ -25,6 +25,9 @@ sealed trait BaseBlock {
   /** when the block was created **/
   def created: DateTime = DateTime.now
 
+  /** blocks are explicitly numbered **/
+  def number: Long = 0L
+
   /** in which version of ubirchChainService was this block created **/
   def version: String = "1.0"
 }
@@ -81,6 +84,7 @@ case class FullBlock(
                       override val created: DateTime,
                       override val version: String,
                       override val previousBlockHash: String,
+                      override val number: Long,
                       override val hashes: Option[Seq[String]],
                       override val anchors: Seq[Anchor] = Seq.empty
                     ) extends BaseBlock with PreviousBlockReference with EventHashes with AnchoredBlock

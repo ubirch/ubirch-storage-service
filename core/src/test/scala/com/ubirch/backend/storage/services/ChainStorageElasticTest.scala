@@ -43,6 +43,7 @@ class ChainStorageElasticTest extends FeatureSpec
     hash = blockHash.hash,
     previousBlockHash = UUIDUtil.uuidStr.sha256.hex,
     created = DateTime.now,
+    number = 2342L,
     version = "1.0",
     hashes = Some(fullBlockHashes)
   )
