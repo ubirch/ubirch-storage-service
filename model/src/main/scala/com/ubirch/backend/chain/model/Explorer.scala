@@ -66,6 +66,7 @@ case class GenesisBlock(
 case class BlockInfo(
                       override val hash: String,
                       override val previousBlockHash: String,
+                      override val number: Long,
                       override val anchors: Seq[Anchor] = Seq.empty,
                       override val created: DateTime = DateTime.now,
                       override val version: String = "1.0"

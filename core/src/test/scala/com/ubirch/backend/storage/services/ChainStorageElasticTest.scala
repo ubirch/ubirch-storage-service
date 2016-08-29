@@ -34,7 +34,8 @@ class ChainStorageElasticTest extends FeatureSpec
 
   val blockInfo = BlockInfo(
     hash = blockHash.hash,
-    previousBlockHash = UUIDUtil.uuidStr.sha256.hex
+    previousBlockHash = UUIDUtil.uuidStr.sha256.hex,
+    number = 2342L
   )
 
   val fullBlockHashes = Seq(UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex)
