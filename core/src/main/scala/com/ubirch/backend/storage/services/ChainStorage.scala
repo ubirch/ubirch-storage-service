@@ -49,6 +49,14 @@ trait ChainStorage extends LazyLogging {
   def getBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]]
 
   /**
+    * Gives us basic information about a block (without all it's hashes) based on the blockHash of it's predecessor.
+    *
+    * @param blockHash blockHash predecessor block
+    * @return block whose predecessor has the specified blockHash
+    */
+  def getBlockInfoByPreviousBlockHash(blockHash: HashedData): Future[Option[BlockInfo]]
+
+  /**
     * Gives us a block including all it's hashes.
     *
     * @param hash hash of the requested block

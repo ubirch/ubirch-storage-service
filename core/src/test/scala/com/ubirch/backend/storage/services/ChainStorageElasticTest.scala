@@ -21,6 +21,12 @@ class ChainStorageElasticTest extends FeatureSpec
   with LazyLogging
   with StorageCleanUp {
 
+  /* TODO refactor tests !!!
+   * Currently they depend on the order of execution including changes made by previous test.
+   * Instead each test may create data it needs. Database clean up can happen either before running a test or afterwards
+   * for as long as the test is responsible of creating the consistent state it needs.
+   */
+
   // if cleanUp == true all tests delete their stuff
   val cleanUp = false
 
@@ -34,7 +40,7 @@ class ChainStorageElasticTest extends FeatureSpec
 
   val blockInfo = BlockInfo(
     hash = blockHash.hash,
-    previousBlockHash = UUIDUtil.uuidStr.sha256.hex,
+    previousBlockHash = genesisBlockHash,
     number = 2342L
   )
 
@@ -42,7 +48,7 @@ class ChainStorageElasticTest extends FeatureSpec
 
   val fullBlockInfo = FullBlock(
     hash = blockHash.hash,
-    previousBlockHash = UUIDUtil.uuidStr.sha256.hex,
+    previousBlockHash = genesisBlockHash,
     created = DateTime.now,
     number = 2342L,
     version = "1.0",
@@ -149,6 +155,22 @@ class ChainStorageElasticTest extends FeatureSpec
       res.isDefined shouldBe true
       res.get.hash shouldBe genesisBlockHash
     }
+
+    scenario("get a BlockInfo based on previousBlockHash (block does not exist though)") {
+
+      val res = Await.result(ChainStorageElastic.getBlockInfoByPreviousBlockHash(blockHash = blockHash), 10 seconds)
+      res shouldBe None
+    }
+
+    scenario("get a BlockInfo based on previousBlockHash (block exists)") {
+
+      // TODO fix test
+      val res = Await.result(ChainStorageElastic.getBlockInfoByPreviousBlockHash(blockHash = HashedData(genesisBlockHash)), 20 seconds)
+      res.isDefined shouldBe true
+      res.get.hash shouldEqual blockHash.hash
+      res.get.previousBlockHash shouldEqual genesisBlockHash
+    }
+
   }
 
   override protected def beforeAll(): Unit = {
