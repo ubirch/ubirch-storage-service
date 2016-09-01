@@ -38,8 +38,8 @@ lazy val ubirchShare = (project in file("ubirch-share"))
   .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ json4s ++ testDependencies
     :+ typesafeConfig :+ ubirchUtilUUID :+ ubirchUtilJson :+ hasher % "test" :+ beeClient % "test")
   .settings(resolvers ++= Seq(
-    "RoundEights" at "http://maven.spikemark.net/roundeights", // Hasher
-    Resolver.bintrayRepo("rick-beton", "maven") // BeeClient (used only in tests)
+    resolverHasher,
+    resolverBeeClient
   ))
 
 lazy val model = (project in file("model"))
@@ -57,8 +57,8 @@ lazy val core = (project in file("core"))
   .settings(libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies
     :+ hasher % "test")
   .settings(resolvers ++= Seq(
-    "RoundEights" at "http://maven.spikemark.net/roundeights", // Hasher (used in tests only)
-    Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
+    resolverHasher,
+    resolverBeeClient
   ))
   .dependsOn(share)
   .dependsOn(model)
@@ -88,7 +88,7 @@ lazy val testUtil = (project in file("test-util"))
     name := "test-util",
     libraryDependencies ++= Seq(typesafeLogging) :+ beeClient,
     resolvers ++= Seq(
-      Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
+      resolverBeeClient
     )
   )
   .dependsOn(share)
@@ -182,6 +182,9 @@ lazy val ubirchUtilsDependencies = Seq(
 lazy val ubirchUtilJson = "com.ubirch.util" %% "json" % "0.1-SNAPSHOT"
 lazy val ubirchUtilJsonAutoConvert = "com.ubirch.util" %% "json-auto-convert" % "0.1-SNAPSHOT"
 lazy val ubirchUtilUUID = "com.ubirch.util" %% "uuid" % "0.1-SNAPSHOT"
+
+lazy val resolverHasher = "RoundEights" at "http://maven.spikemark.net/roundeights"
+lazy val resolverBeeClient = Resolver.bintrayRepo("rick-beton", "maven")
 
 lazy val mergeStrategy = Seq(
   assemblyMergeStrategy in assembly := {
