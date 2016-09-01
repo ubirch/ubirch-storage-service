@@ -12,8 +12,6 @@ name := "ubirch-storage-service"
 homepage := Some(url("http://ubirch.com"))
 
 resolvers in ThisBuild ++= Seq(
-  "RoundEights" at "http://maven.spikemark.net/roundeights", // Hasher
-  Resolver.bintrayRepo("rick-beton", "maven"), // BeeClient
   Opts.resolver.sonatypeSnapshots // ubirch
   //  Opts.resolver.sonatypeReleases // ubirch
 )
@@ -36,8 +34,13 @@ lazy val commonSettings = Seq(
 
 lazy val ubirchShare = (project in file("ubirch-share"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependenciesTest
-    ++ hasherDependencies ++ json4s ++ testDependencies :+ typesafeConfig :+ ubirchUtilUUID :+ ubirchUtilJson)
+  .dependsOn(model)
+  .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ json4s ++ testDependencies
+    :+ typesafeConfig :+ ubirchUtilUUID :+ ubirchUtilJson :+ hasher % "test" :+ beeClient % "test")
+  .settings(resolvers ++= Seq(
+    "RoundEights" at "http://maven.spikemark.net/roundeights", // Hasher
+    Resolver.bintrayRepo("rick-beton", "maven") // BeeClient (used only in tests)
+  ))
 
 lazy val model = (project in file("model"))
   .settings(commonSettings: _*)
@@ -51,7 +54,12 @@ lazy val share = (project in file("share"))
 
 lazy val core = (project in file("core"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies)
+  .settings(libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies
+    :+ hasher % "test")
+  .settings(resolvers ++= Seq(
+    "RoundEights" at "http://maven.spikemark.net/roundeights", // Hasher (used in tests only)
+    Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
+  ))
   .dependsOn(share)
   .dependsOn(model)
   .dependsOn(ubirchShare)
@@ -78,7 +86,10 @@ lazy val testUtil = (project in file("test-util"))
   .settings(commonSettings: _*)
   .settings(
     name := "test-util",
-    libraryDependencies ++= Seq(typesafeLogging) ++ beeHttpDependencies
+    libraryDependencies ++= Seq(typesafeLogging) :+ beeClient,
+    resolvers ++= Seq(
+      Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
+    )
   )
   .dependsOn(share)
 
@@ -137,17 +148,9 @@ lazy val elasticDependencies = Seq(
   "org.elasticsearch" % "elasticsearch" % elasticV exclude("joda-time", "joda-time")
 )
 
-lazy val beeHttpDependencies = Seq(
-  "uk.co.bigbeeconsultants" %% "bee-client" % "0.29.1"
-)
+lazy val beeClient = "uk.co.bigbeeconsultants" %% "bee-client" % "0.29.1"
 
-lazy val beeHttpDependenciesTest = Seq(
-  "uk.co.bigbeeconsultants" %% "bee-client" % "0.29.1" % "test"
-)
-
-lazy val hasherDependencies = Seq(
-  "com.roundeights" %% "hasher" % "1.2.0"
-)
+lazy val hasher = "com.roundeights" %% "hasher" % "1.2.0"
 
 lazy val typesafeLogging = "com.typesafe.scala-logging" %% "scala-logging" % "3.4.0"
 

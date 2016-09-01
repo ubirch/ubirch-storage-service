@@ -1,6 +1,6 @@
 package com.ubirch.backend.services
 
-import com.roundeights.hasher.Hash
+import com.ubirch.backend.chain.model.HashedData
 import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.config.Config
 import com.ubirch.util.json.Json4sUtil
@@ -26,7 +26,7 @@ object PullerService extends MqttCallback with LazyLogging {
     logger.debug(s"Topic: $topic Message: ${message.toString}")
     try {
       val payload = message.toString
-      val jval = Json4sUtil.string2Any[Hash](payload) match {
+      val jval = Json4sUtil.string2Any[HashedData](payload) match {
         case Some(th) =>
         //hasherServiceActor ! th
         case None =>
