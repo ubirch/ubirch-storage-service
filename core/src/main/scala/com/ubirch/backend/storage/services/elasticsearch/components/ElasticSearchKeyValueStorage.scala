@@ -107,7 +107,7 @@ trait ElasticSearchKeyValueStorage extends KeyValueStorageComponent[JValue] with
                |  {
                |    "term" :
                |    {
-               |      "$f(0)" : "$f(1)"
+               |      "${f(0)}" : "${f(1)}"
                |    }
                |  }
                |}
