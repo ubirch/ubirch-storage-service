@@ -3,6 +3,7 @@
   */
 package com.ubirch.backend.chain.model
 
+import com.ubirch.util.date.DateUtil
 import org.joda.time.DateTime
 
 /**
@@ -23,7 +24,7 @@ sealed trait BaseBlock {
   def hash: String
 
   /** when the block was created **/
-  def created: DateTime = DateTime.now
+  def created: DateTime = DateUtil.nowUTC
 
   /** blocks are explicitly numbered **/
   def number: Long = 0L
@@ -54,7 +55,7 @@ sealed trait AnchoredBlock {
   */
 case class GenesisBlock(
                          override val hash: String,
-                         override val created: DateTime = DateTime.now,
+                         override val created: DateTime = DateUtil.nowUTC,
                          override val version: String = "1.0"
                        ) extends BaseBlock
 
@@ -68,7 +69,7 @@ case class BlockInfo(
                       override val previousBlockHash: String,
                       override val number: Long,
                       override val anchors: Seq[Anchor] = Seq.empty,
-                      override val created: DateTime = DateTime.now,
+                      override val created: DateTime = DateUtil.nowUTC,
                       override val version: String = "1.0"
                     )
   extends BaseBlock with PreviousBlockReference with AnchoredBlock {
@@ -103,6 +104,6 @@ case class UnminedHashes(hashes: Seq[String] = Seq.empty)
   */
 case class Anchor(anchorTo: String,
                   hash: String,
-                  created: DateTime = DateTime.now,
+                  created: DateTime = DateUtil.nowUTC,
                   version: String = "1.0"
                  )

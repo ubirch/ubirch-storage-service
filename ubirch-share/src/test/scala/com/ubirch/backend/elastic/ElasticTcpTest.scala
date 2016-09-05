@@ -13,7 +13,6 @@ import org.scalatest.{FeatureSpec, Matchers}
 //import org.elasticsearch.client.transport.TransportClient
 //import org.elasticsearch.common.transport.InetSocketTransportAddress
 //import org.elasticsearch.common.xcontent.XContentFactory._
-import org.joda.time.DateTime
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
@@ -48,7 +47,7 @@ import scala.concurrent.duration._
 //              //            jsonBuilder()
 //              //            .startObject()
 //              //            .field("user", "kimchy")
-//              //            .field("postDate", new DateTime())
+//              //            .field("postDate", DateUtil.nowUTC)
 //              //            .field("message", "trying out Elasticsearch")
 //              //            .endObject()
 //            )

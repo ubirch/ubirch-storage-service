@@ -3,14 +3,73 @@ ubirch generic storage service
 
 ## Scala Dependencies
 
-    resolvers += Resolver.sonatypeRepo("snapshots")
+### `client`
+
+    resolvers ++= Seq(
+	  Resolver.sonatypeRepo("snapshots"),
+	  Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
+	)
+    libraryDependencies ++= Seq(
+      "com.ubirch.backend.storage" %% "client" % "0.0.1-SNAPSHOT"
+    )
+
+### `core`
+
+    resolvers ++= Seq(
+	  Resolver.sonatypeRepo("snapshots"),
+	  "RoundEights" at "http://maven.spikemark.net/roundeights", // Hasher
+	  Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
+	)
+    libraryDependencies ++= Seq(
+      "com.ubirch.backend.storage" %% "core" % "0.0.1-SNAPSHOT"
+    )
+
+### `model`
+
+    resolvers ++= Seq(
+	  Resolver.sonatypeRepo("snapshots")
+	)
     libraryDependencies ++= Seq(
       "com.ubirch.backend.storage" %% "model" % "0.0.1-SNAPSHOT"
+    )
+
+### `share`
+
+    resolvers ++= Seq(
+	  Resolver.sonatypeRepo("snapshots"),
+	  "RoundEights" at "http://maven.spikemark.net/roundeights" // Hasher
+	)
+    libraryDependencies ++= Seq(
       "com.ubirch.backend.storage" %% "share" % "0.0.1-SNAPSHOT"
-      "com.ubirch.backend.storage" %% "core" % "0.0.1-SNAPSHOT"
+    )
+
+### `test-util`
+
+    resolvers ++= Seq(
+	  Resolver.sonatypeRepo("snapshots"),
+	  Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
+	)
+    libraryDependencies ++= Seq(
+      "com.ubirch.backend.storage" %% "test-util" % "0.0.1-SNAPSHOT"
+    )
+
+### `ubirch-share`
+
+    resolvers ++= Seq(
+	  Resolver.sonatypeRepo("snapshots"),
+	  Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
+	)
+    libraryDependencies ++= Seq(
+      "com.ubirch.backend.storage" %% "ubirch-share" % "0.0.1-SNAPSHOT"
+    )
+
+### `server`
+
+    resolvers ++= Seq(
+	  Resolver.sonatypeRepo("snapshots")
+	)
+    libraryDependencies ++= Seq(
       "com.ubirch.backend.storage" %% "server" % "0.0.1-SNAPSHOT"
-      "com.ubirch.backend.storage" %% "client" % "0.0.1-SNAPSHOT"
-      "com.ubirch.backend.storage" %% "test-util" % "0.0.1-SNAPSHOT" % "test
     )
 
 ## client usage
@@ -25,6 +84,7 @@ ubirchStorageService {
   }
   elasticsearch {
     url = "http://localhost:9200"
+    unminedHashesLimit = 10000
     devicemessage {
       index = "ubirch-device-data"
     }

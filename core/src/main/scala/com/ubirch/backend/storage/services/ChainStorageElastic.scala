@@ -116,6 +116,29 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
   }
 
   /**
+    * Gives us basic information about a block (without all it's hashes) based on the blockHash of it's predecessor.
+    *
+    * @param blockHash blockHash predecessor block
+    * @return block whose predecessor has the specified blockHash
+    */
+  override def getBlockInfoByPreviousBlockHash(blockHash: HashedData): Future[Option[BlockInfo]] = {
+
+    // TODO do not ignore genesis block in search
+    BlockStore.fetchAll(filter = Some(s"previousBlockHash:${blockHash.hash}")) map {
+
+      case Some(jvals: List[JValue]) =>
+        jvals.nonEmpty match {
+          case true => jvals.head.extractOpt[BlockInfo]
+          case false => None
+        }
+
+      case None => None
+
+    }
+
+  }
+
+  /**
     * Gives us a block including all it's hashes.
     *
     * @param blockHash hash of the requested block

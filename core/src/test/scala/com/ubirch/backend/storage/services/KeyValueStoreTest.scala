@@ -7,6 +7,7 @@ import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.storage.config.ServerConfig
 import com.ubirch.backend.storage.services.elasticsearch._
 import com.ubirch.backend.storage.services.elasticsearch.components.ElasticSearchKeyValueStorage
+import com.ubirch.util.date.DateUtil
 import com.ubirch.util.json.Json4sUtil
 import com.ubirch.util.uuid.UUIDUtil
 import org.joda.time.DateTime
@@ -21,7 +22,7 @@ import scala.language.postfixOps
 /**
   * Created by derMicha on 05/08/16.
   */
-case class Dupi(id: String, name: String, wumms: String, created: DateTime = DateTime.now) {
+case class Dupi(id: String, name: String, wumms: String, created: DateTime = DateUtil.nowUTC) {
   def asJvalue: JValue = Json4sUtil.any2jvalue(this).get
 
   def asJsonString: String = Json4sUtil.jvalue2String(asJvalue)
