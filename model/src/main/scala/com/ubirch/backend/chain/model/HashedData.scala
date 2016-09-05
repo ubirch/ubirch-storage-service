@@ -1,5 +1,6 @@
 package com.ubirch.backend.chain.model
 
+import com.ubirch.util.date.DateUtil
 import org.joda.time.DateTime
 
 /**
@@ -8,10 +9,10 @@ import org.joda.time.DateTime
   */
 case class HashRequest(
                  data: String,
-                 created: DateTime = DateTime.now()
+                 created: DateTime = DateUtil.nowUTC
                )
 
 case class HashedData(
                  hash: String,
-                 created: DateTime = DateTime.now()
+                 created: DateTime = DateUtil.nowUTC
                )

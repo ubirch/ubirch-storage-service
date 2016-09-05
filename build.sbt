@@ -36,7 +36,7 @@ lazy val ubirchShare = (project in file("ubirch-share"))
   .settings(commonSettings: _*)
   .dependsOn(model)
   .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ json4s ++ testDependencies
-    :+ typesafeConfig :+ ubirchUtilUUID :+ ubirchUtilJson :+ hasher % "test" :+ beeClient % "test")
+    :+ typesafeConfig :+ ubirchUtilUUID :+ ubirchUtilJson :+ hasher % "test" :+ beeClient % "test" :+ ubirchUtilDate % "test")
   .settings(resolvers ++= Seq(
     resolverHasher,
     resolverBeeClient
@@ -44,18 +44,18 @@ lazy val ubirchShare = (project in file("ubirch-share"))
 
 lazy val model = (project in file("model"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ joda ++ testDependencies)
+  .settings(libraryDependencies ++= commonDependencies ++ joda ++ testDependencies :+ ubirchUtilDate)
 
 lazy val share = (project in file("share"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
+  .settings(libraryDependencies ++= commonDependencies ++ testDependencies :+ ubirchUtilDate)
   .dependsOn(model)
   .dependsOn(ubirchShare)
 
 lazy val core = (project in file("core"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies
-    :+ hasher % "test")
+    :+ hasher % "test" :+ ubirchUtilDate)
   .settings(resolvers ++= Seq(
     resolverHasher,
     resolverBeeClient
@@ -179,6 +179,7 @@ lazy val ubirchUtilsDependencies = Seq(
   "com.ubirch.util" %% "crypto" % "0.2-SNAPSHOT"
 )
 
+lazy val ubirchUtilDate = "com.ubirch.util" %% "date" % "0.1-SNAPSHOT"
 lazy val ubirchUtilJson = "com.ubirch.util" %% "json" % "0.1-SNAPSHOT"
 lazy val ubirchUtilJsonAutoConvert = "com.ubirch.util" %% "json-auto-convert" % "0.1-SNAPSHOT"
 lazy val ubirchUtilUUID = "com.ubirch.util" %% "uuid" % "0.1-SNAPSHOT"
