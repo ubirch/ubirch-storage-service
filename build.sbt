@@ -27,6 +27,7 @@ lazy val commonSettings = Seq(
   parallelExecution in ThisBuild := false,
   javaOptions in Test += testConfiguration,
   fork in Test := true,
+  updateOptions := updateOptions.value.withLatestSnapshots(false),
   // in ThisBuild is important to run tests of each subproject sequential instead parallelizing them
   testOptions in ThisBuild ++= Seq(
     Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports"),
@@ -39,6 +40,10 @@ lazy val ubirchShare = (project in file("ubirch-share"))
   .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ beeHttpDependenciesTest
     ++ hasherDependencies ++ json4s ++ testDependencies :+ typesafeConfig :+ ubirchUtilUUID :+ ubirchUtilJson)
 
+lazy val config = (project in file("config"))
+  .settings(commonSettings: _*)
+  .settings(libraryDependencies ++= commonDependencies)
+
 lazy val model = (project in file("model"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++= commonDependencies ++ joda ++ testDependencies)
@@ -46,8 +51,9 @@ lazy val model = (project in file("model"))
 lazy val share = (project in file("share"))
   .settings(commonSettings: _*)
   .settings(libraryDependencies ++= commonDependencies ++ testDependencies)
-  .dependsOn(model)
   .dependsOn(ubirchShare)
+  .dependsOn(config)
+  .dependsOn(model)
 
 lazy val core = (project in file("core"))
   .settings(commonSettings: _*)
@@ -60,8 +66,7 @@ lazy val core = (project in file("core"))
 lazy val server = (project in file("server"))
   .settings(commonSettings: _*)
   .settings(mergeStrategy: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies
-    :+ ubirchUtilJsonAutoConvert)
+  .settings(libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies :+ ubirchUtilJsonAutoConvert)
   .dependsOn(share)
   .dependsOn(core)
   .dependsOn(model)
@@ -69,7 +74,7 @@ lazy val server = (project in file("server"))
 lazy val client = (project in file("client"))
   .settings(commonSettings: _*)
   .settings(scmInfo := Some(ScmInfo(url("https://github.com/ubirch/ubirch-storage-service"), "git@github.com:ubirch/ubirch-storage-service.git")))
-  .settings(libraryDependencies ++= commonDependencies)
+  .settings(libraryDependencies := commonDependencies ++ joda ++ akkaHttpDependencies ++ testDependencies)
   .dependsOn(share)
   .dependsOn(core)
   .dependsOn(model)
@@ -185,7 +190,9 @@ lazy val mergeStrategy = Seq(
     case PathList("org", "joda", "time", xs@_*) => MergeStrategy.first
     case m if m.toLowerCase.endsWith("manifest.mf") => MergeStrategy.discard
     case m if m.toLowerCase.matches("meta-inf.*\\.sf$") => MergeStrategy.discard
-    case "application.conf" => MergeStrategy.concat
+    case m if m.toLowerCase.endsWith("application.conf") => MergeStrategy.concat
+    case m if m.toLowerCase.endsWith("application.dev.conf") => MergeStrategy.first
+    case m if m.toLowerCase.endsWith("application.base.conf") => MergeStrategy.first
     case "reference.conf" => MergeStrategy.concat
     case _ => MergeStrategy.first
   }

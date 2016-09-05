@@ -28,25 +28,44 @@ class ChainStorageElasticTest extends FeatureSpec
 
   val hashValues = List(UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex)
 
-  val blockHash: HashedData = HashedData(hash = UUIDUtil.uuidStr.sha256.hex)
-
   val genesisBlockHash = UUIDUtil.uuidStr.sha256.hex
 
-  val blockInfo = BlockInfo(
-    hash = blockHash.hash,
-    previousBlockHash = UUIDUtil.uuidStr.sha256.hex,
-    number = 2342L
+  val blockHash1: HashedData = HashedData(hash = UUIDUtil.uuidStr.sha256.hex)
+
+  val blockInfo1 = BlockInfo(
+    hash = blockHash1.hash,
+    previousBlockHash = genesisBlockHash,
+    number = 1L
   )
 
-  val fullBlockHashes = Seq(UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex)
+  val blockHash2: HashedData = HashedData(hash = UUIDUtil.uuidStr.sha256.hex)
 
-  val fullBlockInfo = FullBlock(
-    hash = blockHash.hash,
-    previousBlockHash = UUIDUtil.uuidStr.sha256.hex,
+  val blockInfo2 = BlockInfo(
+    hash = blockHash2.hash,
+    previousBlockHash = blockInfo1.hash,
+    number = 2L
+  )
+
+  val fullBlockHashes1 = Seq(UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex)
+
+  val fullBlockInfo1 = FullBlock(
+    hash = blockHash1.hash,
+    previousBlockHash = genesisBlockHash,
     created = DateTime.now,
-    number = 2342L,
+    number = blockInfo1.number,
     version = "1.0",
-    hashes = Some(fullBlockHashes)
+    hashes = Some(fullBlockHashes1)
+  )
+
+  val fullBlockHashes2 = Seq(UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex, UUIDUtil.uuidStr.sha256.hex)
+
+  val fullBlockInfo2 = FullBlock(
+    hash = blockHash2.hash,
+    previousBlockHash = blockInfo1.hash,
+    created = DateTime.now,
+    number = blockInfo2.number,
+    version = "1.0",
+    hashes = Some(fullBlockHashes2)
   )
 
   feature("ChainStoreES") {
@@ -98,16 +117,30 @@ class ChainStorageElasticTest extends FeatureSpec
 
     scenario("store a BlockInfo") {
 
-      val res = Await.result(ChainStorageElastic.upsertBlock(block = blockInfo), 10 seconds)
+      val res = Await.result(ChainStorageElastic.upsertBlock(block = blockInfo1), 10 seconds)
       res.isDefined shouldBe true
-      res.get.hash shouldBe blockInfo.hash
+      res.get.hash shouldBe blockInfo1.hash
     }
 
     scenario("get a BlockInfo") {
 
-      val res = Await.result(ChainStorageElastic.getBlockInfo(blockHash = blockHash), 10 seconds)
+      val res = Await.result(ChainStorageElastic.getBlockInfo(blockHash = blockHash1), 10 seconds)
       res.isDefined shouldBe true
-      res.get.hash shouldBe blockHash.hash
+      res.get.hash shouldBe blockHash1.hash
+    }
+
+    scenario("store a 2nd BlockInfo") {
+
+      val res = Await.result(ChainStorageElastic.upsertBlock(block = blockInfo2), 10 seconds)
+      res.isDefined shouldBe true
+      res.get.hash shouldBe blockInfo2.hash
+    }
+
+    scenario("get a 2nd BlockInfo") {
+
+      val res = Await.result(ChainStorageElastic.getBlockInfo(blockHash = blockHash2), 10 seconds)
+      res.isDefined shouldBe true
+      res.get.hash shouldBe blockHash2.hash
     }
 
     ignore("get BlockInfo by hash") {
@@ -120,9 +153,9 @@ class ChainStorageElasticTest extends FeatureSpec
 
     scenario("get a FullBlock") {
 
-      val res = Await.result(ChainStorageElastic.getFullBlock(blockHash = blockHash.hash), 10 seconds)
+      val res = Await.result(ChainStorageElastic.getFullBlock(blockHash = blockHash1.hash), 10 seconds)
       res.isDefined shouldBe true
-      res.get.hash shouldBe blockHash.hash
+      res.get.hash shouldBe blockHash1.hash
 
     }
     scenario("load most recent BlockInfo") {
@@ -131,7 +164,7 @@ class ChainStorageElasticTest extends FeatureSpec
 
       val res = Await.result(ChainStorageElastic.mostRecentBlock(), 10 seconds)
       res.isDefined shouldBe true
-      res.get.hash shouldBe blockHash.hash
+      res.get.hash shouldBe blockHash2.hash
     }
 
     scenario("save a GenesisBlock") {

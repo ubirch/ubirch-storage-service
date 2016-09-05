@@ -21,12 +21,14 @@ import java.net.{URI, URL}
 
 import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.util.json.Json4sUtil
-import org.json4s.DefaultFormats
-import org.json4s.JsonAST.JValue
 import uk.co.bigbeeconsultants.http._
 import uk.co.bigbeeconsultants.http.header.MediaType._
 import uk.co.bigbeeconsultants.http.request.RequestBody
 import uk.co.bigbeeconsultants.http.response.Status._
+
+import org.json4s._
+import org.json4s.JsonDSL._
+import org.json4s.jackson.JsonMethods._
 
 import scala.concurrent.Future
 
@@ -88,49 +90,64 @@ trait ElasticSearchKeyValueStorage extends KeyValueStorageComponent[JValue] with
     /**
       *
       * @param limit     limits the reuslts, 0 means no limit
-      * @param orderedBy valid field name for ordering
-      * @param order     asc|desc, asc is default
+      * @param sortedBy  valid field name for ordering
+      * @param sortOrder asc|desc, asc is default
       * @param filter    valid filter expression for filtering, e.g. hash:oPuXzuOUticwd3iFJjc
       * @return
       */
-    override def fetchAll(limit: Int = 0, orderedBy: Option[String] = None, order: String = "asc", filter: Option[String]): Future[Option[List[JValue]]] = Future {
+    override def fetchAll(limit: Int = 10000, sortedBy: Option[String] = None, sortOrder: String = "asc", filter: Option[String]): Future[Option[List[JValue]]] = Future {
 
-      val f = filter match {
-        case Some(f) =>
-          s"&$f"
-        case None =>
-          ""
-      }
+      val filterJVal: JValue = if (filter.isDefined) {
+        val f = filter.get.split(":")
+        if (f.size == 2) {
+          parse(
+            s"""
+               |{
+               |  "query" :
+               |  {
+               |    "term" :
+               |    {
+               |      "$f(0)" : "$f(1)"
+               |    }
+               |  }
+               |}
+             """.stripMargin
+          )
+        } else Json4sUtil.string2JValue("{}")
+      } else Json4sUtil.string2JValue("{}")
 
-      val o = orderedBy match {
-        case Some(f) =>
-          order match {
-            case "asc" =>
-              s"&order=$f:asc"
-            case _ =>
-              s"&order=$f:desc"
-          }
-        case None => ""
-      }
+      val sortJVal: JValue = if (sortedBy.isDefined) {
+        parse(
+          s"""
+             |{
+             | "sort" :
+             | {
+             | "${sortedBy.get}":
+             |   {
+             |     "order" : "$sortOrder"
+             |   }
+             | }
+             |}
+          """.stripMargin
+        )
+      } else parse("{}")
 
-      val l = if (limit > 0)
-        s"&size=$limit"
-      else
-        ""
+      val jQueryStr: JValue = parse(
+        s"""
+           |{"size" : $limit}
+        """.stripMargin
+      )
 
-      val urlExt = {
-        val ue = s"$l$o$f"
-        if (ue.startsWith("&")) {
-          val fue = ue.replaceFirst("&", "?")
-          s"_search$fue"
-        }
-        else
-          "_search"
-      }
+      val cUrl = uri.resolve("_search").toURL
 
-      val cUrl = uri.resolve(urlExt).toURL
+      val reqBody = compact(render(filterJVal merge sortJVal merge jQueryStr)).stripMargin
+
+      val jsonBody = RequestBody(
+        reqBody
+        , APPLICATION_JSON)
+
       logger.debug(s"current fetch url: $cUrl")
-      val response = httpClient.get(cUrl)
+      val response = httpClient.post(cUrl, Some(jsonBody))
 
       response match {
         case r if !r.status.isSuccess =>

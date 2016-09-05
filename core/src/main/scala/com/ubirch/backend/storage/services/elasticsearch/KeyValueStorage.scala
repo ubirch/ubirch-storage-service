@@ -43,7 +43,7 @@ class KeyValueStorage[T] {
     * @param limit limits the reuslt size, 0 means no limit
     * @return
     */
-  def fetchAll(limit: Int = 0, ordered: Option[String] = None, order: String = "asc", filter: Option[String] = None) = storage.fetchAll(limit = limit, ordered = ordered, order = order, filter = filter)
+  def fetchAll(limit: Int = 10000, ordered: Option[String] = None, order: String = "asc", filter: Option[String] = None) = storage.fetchAll(limit = limit, ordered = ordered, order = order, filter = filter)
 
   /**
     * Store a data point. It is up to the underlying implementation to extract a timestamp
