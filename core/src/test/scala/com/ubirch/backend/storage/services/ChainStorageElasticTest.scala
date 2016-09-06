@@ -78,13 +78,13 @@ class ChainStorageElasticTest extends FeatureSpec
 
     scenario("store a hash") {
       val res = Await.result(ChainStorageElastic.storeHash(hashValue), 10 seconds)
-      res.isDefined shouldBe true
+      res shouldBe 'isDefined
       res.get.hash shouldBe hashValue.hash
     }
 
     scenario("fetch a hash") {
       val fetchedHash = Await.result(ChainStorageElastic.getHash(hashValue.hash), 10 seconds)
-      fetchedHash.isDefined shouldBe true
+      fetchedHash shouldBe 'isDefined
       fetchedHash.get.hash shouldBe hashValue.hash
     }
 
@@ -92,7 +92,7 @@ class ChainStorageElasticTest extends FeatureSpec
 
       hashValues.foreach { hash =>
         val hv = Await.result(ChainStorageElastic.getHash(hash), 10 seconds)
-        hv.isDefined shouldBe true
+        hv shouldBe 'isDefined
         hv.get.hash shouldBe hash
       }
 
@@ -102,14 +102,14 @@ class ChainStorageElasticTest extends FeatureSpec
 
       hashValues.foreach { hash =>
         val hv = Await.result(ChainStorageElastic.getHash(hash), 10 seconds)
-        hv.isDefined shouldBe false
+        hv shouldBe 'isEmpty
       }
     }
 
     scenario("fetch unminded hashes") {
       Thread.sleep(500)
       val unminedHashes = Await.result(ChainStorageElastic.unminedHashes(), 10 seconds)
-      unminedHashes.hashes.nonEmpty shouldBe true
+      unminedHashes.hashes shouldBe 'nonEmpty
       unminedHashes.hashes.head shouldBe hashValue.hash
     }
 
@@ -118,41 +118,41 @@ class ChainStorageElasticTest extends FeatureSpec
       res shouldBe true
 
       val fetchedHash = Await.result(ChainStorageElastic.getHash(hashValue.hash), 10 seconds)
-      fetchedHash.isDefined shouldBe false
+      fetchedHash shouldBe 'isEmpty
     }
 
     scenario("store a BlockInfo") {
 
       val res = Await.result(ChainStorageElastic.upsertBlock(block = blockInfo1), 10 seconds)
-      res.isDefined shouldBe true
+      res shouldBe 'isDefined
       res.get.hash shouldBe blockInfo1.hash
     }
 
     scenario("get a BlockInfo") {
 
       val res = Await.result(ChainStorageElastic.getBlockInfo(blockHash = blockHash1), 10 seconds)
-      res.isDefined shouldBe true
+      res shouldBe 'isDefined
       res.get.hash shouldBe blockHash1.hash
     }
 
     scenario("store a 2nd BlockInfo") {
 
       val res = Await.result(ChainStorageElastic.upsertBlock(block = blockInfo2), 10 seconds)
-      res.isDefined shouldBe true
+      res shouldBe 'isDefined
       res.get.hash shouldBe blockInfo2.hash
     }
 
     scenario("get a 2nd BlockInfo") {
 
       val res = Await.result(ChainStorageElastic.getBlockInfo(blockHash = blockHash2), 10 seconds)
-      res.isDefined shouldBe true
+      res shouldBe 'isDefined
       res.get.hash shouldBe blockHash2.hash
     }
 
     ignore("get BlockInfo by hash") {
 
       //      val res = Await.result(ChainStorageElastic.getBlockByEventHash(), 10 seconds)
-      //      res.isDefined shouldBe true
+      //      res shouldBe 'isDefined
       //      res.get.hash shouldBe blockHash.hash
 
     }
@@ -160,7 +160,7 @@ class ChainStorageElasticTest extends FeatureSpec
     scenario("get a FullBlock") {
 
       val res = Await.result(ChainStorageElastic.getFullBlock(blockHash = blockHash1.hash), 10 seconds)
-      res.isDefined shouldBe true
+      res shouldBe 'isDefined
       res.get.hash shouldBe blockHash1.hash
 
     }
@@ -169,7 +169,7 @@ class ChainStorageElasticTest extends FeatureSpec
       Thread.sleep(1000)
 
       val res = Await.result(ChainStorageElastic.mostRecentBlock(), 10 seconds)
-      res.isDefined shouldBe true
+      res shouldBe 'isDefined
       res.get.hash shouldBe blockHash2.hash
     }
 
@@ -179,13 +179,13 @@ class ChainStorageElasticTest extends FeatureSpec
       )
 
       val res = Await.result(ChainStorageElastic.saveGenesisBlock(genesis = genesisBlock), 10 seconds)
-      res.isDefined shouldBe true
+      res shouldBe 'isDefined
       res.get.hash shouldBe genesisBlock.hash
     }
 
     scenario("load a GenesisBlock") {
       val res = Await.result(ChainStorageElastic.getGenesisBlock, 10 seconds)
-      res.isDefined shouldBe true
+      res shouldBe 'isDefined
       res.get.hash shouldBe genesisBlockHash
     }
 
@@ -197,9 +197,8 @@ class ChainStorageElasticTest extends FeatureSpec
 
     scenario("get a BlockInfo based on previousBlockHash (block exists)") {
 
-      // TODO fix test
       val res = Await.result(ChainStorageElastic.getBlockInfoByPreviousBlockHash(blockHash = HashedData(genesisBlockHash)), 20 seconds)
-      res.isDefined shouldBe true
+      res shouldBe 'isDefined
       res.get.hash shouldEqual blockHash1.hash
       res.get.previousBlockHash shouldEqual genesisBlockHash
     }
