@@ -121,7 +121,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param blockHash blockHash predecessor block
     * @return block whose predecessor has the specified blockHash
     */
-  override def getBlockInfoByPreviousBlockHash(blockHash: HashedData): Future[Option[BlockInfo]] = {
+  override def getNextBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = {
 
     // TODO do not ignore genesis block in search
     BlockStore.fetchAll(filter = Some(s"previousBlockHash:${blockHash.hash}")) map {

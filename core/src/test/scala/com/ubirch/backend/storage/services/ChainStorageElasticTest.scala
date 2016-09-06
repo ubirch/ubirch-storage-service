@@ -189,15 +189,15 @@ class ChainStorageElasticTest extends FeatureSpec
       res.get.hash shouldBe genesisBlockHash
     }
 
-    scenario("get a BlockInfo based on previousBlockHash (block does not exist though)") {
+    scenario("get next BlockInfo (block does not exist though)") {
 
-      val res = Await.result(ChainStorageElastic.getBlockInfoByPreviousBlockHash(blockHash = blockHash2), 10 seconds)
+      val res = Await.result(ChainStorageElastic.getNextBlockInfo(blockHash = blockHash2), 10 seconds)
       res shouldBe None
     }
 
-    scenario("get a BlockInfo based on previousBlockHash (block exists)") {
+    scenario("get next BlockInfo (block exists)") {
 
-      val res = Await.result(ChainStorageElastic.getBlockInfoByPreviousBlockHash(blockHash = HashedData(genesisBlockHash)), 20 seconds)
+      val res = Await.result(ChainStorageElastic.getNextBlockInfo(blockHash = HashedData(genesisBlockHash)), 20 seconds)
       res shouldBe 'isDefined
       res.get.hash shouldEqual blockHash1.hash
       res.get.previousBlockHash shouldEqual genesisBlockHash
