@@ -34,7 +34,7 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
     * @param blockHash blockHash predecessor block
     * @return block whose predecessor has the specified blockHash
     */
-  override def getNextBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getBlockInfo(blockHash)
+  override def getNextBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getNextBlockInfo(blockHash)
 
   /**
     * deletes a set of hash from the list of unmined hashes.
