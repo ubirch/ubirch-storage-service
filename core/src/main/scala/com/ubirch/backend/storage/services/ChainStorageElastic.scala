@@ -124,7 +124,8 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
   override def getNextBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = {
 
     // TODO do not ignore genesis block in search
-    BlockStore.fetchAll(filter = Some(s"previousBlockHash:${blockHash.hash}")) map {
+    val filter = Some(s"previousBlockHash:${blockHash.hash}")
+    BlockStore.fetchAll(filter = filter) map {
 
       case Some(jvals: List[JValue]) =>
         jvals.nonEmpty match {
@@ -154,7 +155,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
   }
 
   override def mostRecentBlock(): Future[Option[BlockInfo]] = {
-    BlockStore.fetchAll(ordered = Some("number"), order = "desc", limit = 1).map {
+    BlockStore.fetchAll(sortedBy = Some("number"), order = "desc", limit = 1).map {
       case Some(jvals: List[JValue]) =>
         jvals.nonEmpty match {
           case true => jvals.head.extractOpt[BlockInfo]
