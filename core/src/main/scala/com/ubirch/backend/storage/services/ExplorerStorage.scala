@@ -9,14 +9,7 @@ import scala.concurrent.Future
   * author: cvandrei
   * since: 2016-08-01
   */
-trait ChainStorage extends LazyLogging {
-
-  /**
-    * Adds a hash to the list of unmined hashes.
-    *
-    * @param hash the hash to store
-    */
-  def storeHash(hash: HashedData): Future[Option[HashedData]]
+trait ExplorerStorage extends LazyLogging {
 
   /**
     * deletes a hash from the list of unmined hashes.

@@ -14,26 +14,9 @@ import scala.concurrent.Future
 /**
   * Created by derMicha on 05/08/16.
   */
-object ChainStorageElastic extends ChainStorage with LazyLogging {
+object ChainStorageElastic extends ExplorerStorage with LazyLogging {
 
   implicit val formats = DefaultFormats.lossless ++ org.json4s.ext.JodaTimeSerializers.all
-
-  /**
-    * Adds a hash to the list of unmined hashes.
-    *
-    * @param hash the hash to store
-    */
-  override def storeHash(hash: HashedData): Future[Option[HashedData]] = {
-    Json4sUtil.any2jvalue(hash) match {
-      case Some(hashJval) =>
-        HashStore.store(hash.hash, hashJval).map { r =>
-          Some(hash)
-        }
-      case None =>
-        logger.error(s"got invalid hash value: $hash")
-        Future(None)
-    }
-  }
 
   def getHash(hash: String): Future[Option[HashedData]] = {
     HashStore.fetch(hash).map {

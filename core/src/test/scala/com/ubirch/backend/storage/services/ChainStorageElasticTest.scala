@@ -76,11 +76,12 @@ class ChainStorageElasticTest extends FeatureSpec
 
   feature("ChainStoreES") {
 
-    scenario("store a hash") {
-      val res = Await.result(ChainStorageElastic.storeHash(hashValue), 10 seconds)
-      res shouldBe 'isDefined
-      res.get.hash shouldBe hashValue.hash
-    }
+    // TODO move to ChainStorageNeo4JTest
+//    scenario("store a hash") {
+//      val res = Await.result(ChainStorageElastic.storeHash(hashValue), 10 seconds)
+//      res shouldBe 'isDefined
+//      res.get.hash shouldBe hashValue.hash
+//    }
 
     scenario("fetch a hash") {
       val fetchedHash = Await.result(ChainStorageElastic.getHash(hashValue.hash), 10 seconds)
@@ -213,7 +214,8 @@ class ChainStorageElasticTest extends FeatureSpec
 
     hashValues.foreach { hv =>
       val hash = HashedData(hv)
-      Await.result(ChainStorageElastic.storeHash(hash), 10 seconds)
+      // TODO update test tooling
+//      Await.result(ChainStorageElastic.storeHash(hash), 10 seconds)
     }
 
   }
