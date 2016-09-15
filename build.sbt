@@ -5,7 +5,7 @@ packagedArtifacts in file(".") := Map.empty // disable publishing of root/defaul
 
 scalaVersion in ThisBuild := "2.11.8"
 
-maintainer := "Michael Merz <dermicha@ubirch.com>"
+//maintainer := "Michael Merz <dermicha@ubirch.com>"
 
 name := "ubirch-storage-service"
 
@@ -72,7 +72,21 @@ lazy val core = (project in file("core"))
   .dependsOn(testUtil)
 
 lazy val server = (project in file("server"))
+  .enablePlugins(DockerPlugin)
   .settings(commonSettings: _*)
+  .settings(
+    dockerfile in docker := {
+      // The assembly task generates a fat JAR file
+      val artifact: File = assembly.value
+      val artifactTargetPath = s"/app/${artifact.name}"
+
+      new Dockerfile {
+        from("java")
+        add(artifact, artifactTargetPath)
+        entryPoint("java", "-jar", artifactTargetPath)
+      }
+    }
+  )
   .settings(mergeStrategy: _*)
   .settings(libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies :+ ubirchUtilJsonAutoConvert)
   .dependsOn(share)

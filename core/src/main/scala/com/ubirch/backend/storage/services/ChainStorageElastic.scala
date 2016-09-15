@@ -124,7 +124,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
   override def getBlockInfoByPreviousBlockHash(blockHash: HashedData): Future[Option[BlockInfo]] = {
 
     // TODO do not ignore genesis block in search
-    BlockStore.fetchAll(filter = Some(s"previousBlockHash:${blockHash.hash}")) map {
+    BlockStore.fetchAll(limit = 1, filter = Some(s"previousBlockHash:${blockHash.hash}")) map {
 
       case Some(jvals: List[JValue]) =>
         jvals.nonEmpty match {
@@ -187,19 +187,19 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param block block info to store
     */
   override def upsertBlock(block: BlockInfo): Future[Option[BlockInfo]] =
-    Json4sUtil.any2jvalue(block) match {
-      case Some(jval) =>
-        BlockStore.store(block.hash, jval).map {
-          case Some(bi) =>
-            //@TODO add deeper result check
-            Some(block)
-          case None =>
-            None
-        }
-      case None =>
-        logger.error(s"could not store BlockInfo: $block")
-        Future(None)
-    }
+  Json4sUtil.any2jvalue(block) match {
+    case Some(jval) =>
+      BlockStore.store(block.hash, jval).map {
+        case Some(bi) =>
+          //@TODO add deeper result check
+          Some(block)
+        case None =>
+          None
+      }
+    case None =>
+      logger.error(s"could not store BlockInfo: $block")
+      Future(None)
+  }
 
   /**
     * Saves or updates a block.
@@ -207,30 +207,30 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param fullBlock block info to store
     */
   override def upsertFullBlock(fullBlock: FullBlock): Future[Option[FullBlock]] =
-    Json4sUtil.any2jvalue(fullBlock) match {
-      case Some(jval) =>
-        BlockStore.store(fullBlock.hash, jval).map {
-          case Some(bi) =>
-            //@TODO add deeper result check
-            Some(fullBlock)
-          case None =>
-            None
-        }
-      case None =>
-        logger.error(s"could not store BlockInfo: $fullBlock")
-        Future(None)
-    }
+  Json4sUtil.any2jvalue(fullBlock) match {
+    case Some(jval) =>
+      BlockStore.store(fullBlock.hash, jval).map {
+        case Some(bi) =>
+          //@TODO add deeper result check
+          Some(fullBlock)
+        case None =>
+          None
+      }
+    case None =>
+      logger.error(s"could not store BlockInfo: $fullBlock")
+      Future(None)
+  }
 
   /**
     * @return the genesis block; None if none exists
     */
   override def getGenesisBlock: Future[Option[GenesisBlock]] =
-    GenesisBlockStore.fetch("1") map {
-      case Some(bJval) =>
-        bJval.extractOpt[GenesisBlock]
-      case None =>
-        None
-    }
+  GenesisBlockStore.fetch("1") map {
+    case Some(bJval) =>
+      bJval.extractOpt[GenesisBlock]
+    case None =>
+      None
+  }
 
 }
 
