@@ -81,9 +81,9 @@ lazy val server = (project in file("server"))
       val artifactTargetPath = s"/app/${artifact.name}"
 
       new Dockerfile {
-        from("java")
+        from("ubirch/java")
         add(artifact, artifactTargetPath)
-        entryPoint("java", "-jar", artifactTargetPath)
+        entryPoint("java", "-jar", artifactTargetPath, "-D")
       }
     }
   )
