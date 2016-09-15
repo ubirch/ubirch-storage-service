@@ -107,3 +107,8 @@ ubirchStorageService {
   }
 }
 ```
+
+## create docker image
+```
+./sbt server/docker
+```
