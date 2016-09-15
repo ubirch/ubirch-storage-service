@@ -14,26 +14,9 @@ import scala.concurrent.Future
 /**
   * Created by derMicha on 05/08/16.
   */
-object ChainStorageElastic extends ChainStorage with LazyLogging {
+object ChainStorageElastic extends ExplorerStorage with LazyLogging {
 
   implicit val formats = DefaultFormats.lossless ++ org.json4s.ext.JodaTimeSerializers.all
-
-  /**
-    * Adds a hash to the list of unmined hashes.
-    *
-    * @param hash the hash to store
-    */
-  override def storeHash(hash: HashedData): Future[Option[HashedData]] = {
-    Json4sUtil.any2jvalue(hash) match {
-      case Some(hashJval) =>
-        HashStore.store(hash.hash, hashJval).map { r =>
-          Some(hash)
-        }
-      case None =>
-        logger.error(s"got invalid hash value: $hash")
-        Future(None)
-    }
-  }
 
   def getHash(hash: String): Future[Option[HashedData]] = {
     HashStore.fetch(hash).map {
@@ -121,10 +104,11 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
     * @param blockHash blockHash predecessor block
     * @return block whose predecessor has the specified blockHash
     */
-  override def getBlockInfoByPreviousBlockHash(blockHash: HashedData): Future[Option[BlockInfo]] = {
+  override def getNextBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = {
 
     // TODO do not ignore genesis block in search
-    BlockStore.fetchAll(limit = 1, filter = Some(s"previousBlockHash:${blockHash.hash}")) map {
+    val filter = Some(s"previousBlockHash:${blockHash.hash}")
+    BlockStore.fetchAll(filter = filter) map {
 
       case Some(jvals: List[JValue]) =>
         jvals.nonEmpty match {
@@ -154,7 +138,7 @@ object ChainStorageElastic extends ChainStorage with LazyLogging {
   }
 
   override def mostRecentBlock(): Future[Option[BlockInfo]] = {
-    BlockStore.fetchAll(ordered = Some("number"), order = "desc", limit = 1).map {
+    BlockStore.fetchAll(sortedBy = Some("number"), order = "desc", limit = 1).map {
       case Some(jvals: List[JValue]) =>
         jvals.nonEmpty match {
           case true => jvals.head.extractOpt[BlockInfo]

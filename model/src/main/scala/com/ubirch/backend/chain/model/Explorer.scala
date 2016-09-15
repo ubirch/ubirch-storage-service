@@ -30,7 +30,7 @@ sealed trait BaseBlock {
   def number: Long = 0L
 
   /** in which version of ubirchChainService was this block created **/
-  def version: String = "1.0"
+  def version: String = MetaModel.version
 }
 
 sealed trait PreviousBlockReference {
@@ -56,7 +56,7 @@ sealed trait AnchoredBlock {
 case class GenesisBlock(
                          override val hash: String,
                          override val created: DateTime = DateUtil.nowUTC,
-                         override val version: String = "1.0"
+                         override val version: String = MetaModel.version
                        ) extends BaseBlock
 
 /**
@@ -70,10 +70,17 @@ case class BlockInfo(
                       override val number: Long,
                       override val anchors: Seq[Anchor] = Seq.empty,
                       override val created: DateTime = DateUtil.nowUTC,
-                      override val version: String = "1.0"
+                      override val version: String = MetaModel.version
                     )
-  extends BaseBlock with PreviousBlockReference with AnchoredBlock {
-}
+  extends BaseBlock with PreviousBlockReference with AnchoredBlock
+
+case class BaseBlockInfo(
+                          override val hash: String,
+                          override val created: DateTime = DateUtil.nowUTC,
+                          override val number: Long,
+                          override val version: String = MetaModel.version
+                        )
+  extends BaseBlock
 
 /**
   * @param hash              hash of the block
@@ -105,5 +112,6 @@ case class UnminedHashes(hashes: Seq[String] = Seq.empty)
 case class Anchor(anchorTo: String,
                   hash: String,
                   created: DateTime = DateUtil.nowUTC,
-                  version: String = "1.0"
+                  version: String = MetaModel.version,
+                  block: Option[BaseBlockInfo] = None
                  )

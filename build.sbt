@@ -20,7 +20,7 @@ lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("t
 
 lazy val commonSettings = Seq(
   organization := "com.ubirch.backend.storage",
-  version := "0.0.1-SNAPSHOT",
+  version := "0.1.0-SNAPSHOT",
   test in assembly := {},
   parallelExecution in ThisBuild := false,
   javaOptions in Test += testConfiguration,

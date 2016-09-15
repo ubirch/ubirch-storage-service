@@ -2,21 +2,47 @@ package com.ubirch.client.storage
 
 import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.chain.model._
-import com.ubirch.backend.storage.services.{ChainStorage, ChainStorageElastic}
+import com.ubirch.backend.storage.services.{ChainStorageElastic, ChainStorageNeo4J, ExplorerStorage, MinerStorage}
 
 import scala.concurrent.Future
 
 /**
   * Created by derMicha on 13/08/16.
   */
-object ChainStorageServiceClient extends ChainStorage with LazyLogging {
+object ChainStorageServiceClient extends ExplorerStorage
+  with MinerStorage
+  with LazyLogging {
+
+  /*
+   * MinerStorage methods
+   **********************************/
+
   /**
     * Adds a hash to the list of unmined hashes.
     *
     * @param hash the hash to store
     */
-  override def storeHash(hash: HashedData): Future[Option[HashedData]] = ChainStorageElastic.storeHash(hash)
+  override def storeHash(hash: HashedData): Future[Option[HashedData]] = ChainStorageNeo4J.storeHash(hash)
 
+  /**
+    * There's always exactly one unmined block which through mining becomes the newest block in the chain.
+    *
+    * @return the unmined block
+    */
+  override def unminedBlock(): Future[BlockInfo] = ChainStorageNeo4J.unminedBlock()
+
+  // TODO method saving the genesis block
+
+  /**
+    * Insert an unmined block.
+    *
+    * @return BlockInfo of the inserted block
+    */
+  override def insertUnminedBlock(): Future[BlockInfo] = ChainStorageNeo4J.insertUnminedBlock()
+
+  /*
+   * ExplorerStorage methods
+   **********************************/
 
   override def mostRecentBlock(): Future[Option[BlockInfo]] = ChainStorageElastic.mostRecentBlock()
 
@@ -34,7 +60,7 @@ object ChainStorageServiceClient extends ChainStorage with LazyLogging {
     * @param blockHash blockHash predecessor block
     * @return block whose predecessor has the specified blockHash
     */
-  override def getBlockInfoByPreviousBlockHash(blockHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getBlockInfo(blockHash)
+  override def getNextBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getNextBlockInfo(blockHash)
 
   /**
     * deletes a set of hash from the list of unmined hashes.

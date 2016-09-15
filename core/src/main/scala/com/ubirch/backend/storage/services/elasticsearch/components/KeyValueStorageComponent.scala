@@ -31,7 +31,7 @@ trait KeyValueStorageComponent[T] {
   protected trait KeyValueStorage[A] {
     def fetch(key: String): Future[Option[A]]
 
-    def fetchAll(limit: Int = 0, ordered: Option[String], order: String, filter: Option[String]): Future[Option[List[A]]]
+    def fetchAll(limit: Int = 0, sortedBy: Option[String], order: String, filter: Option[String]): Future[Option[List[A]]]
 
     def store(key: String, value: A): Future[Option[A]]
 
