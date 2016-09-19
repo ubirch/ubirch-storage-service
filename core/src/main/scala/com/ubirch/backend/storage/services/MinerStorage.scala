@@ -12,21 +12,39 @@ import scala.concurrent.Future
 trait MinerStorage extends LazyLogging {
 
   /**
-    * Adds a hash to the list of unmined hashes.
+    * Add a hash and assign it to the [[unminedBlock()]].
     *
     * @param hash the hash to store
     */
   def storeHash(hash: HashedData): Future[Option[HashedData]]
 
-  /**
-    * Insert an unmined block.
-    *
-    * @return BlockInfo of the inserted block
-    */
-  def insertUnminedBlock(): Future[BlockInfo]
+  def reassignHashes(hashes: Seq[HashedData], newBlockNumber: Long): Seq[HashedData]
 
   /**
-    * There's always exactly one unmined block which through mining becomes the newest block in the chain.
+    * Load all hashes for a given block number.
+    *
+    * @param blockNumber load hashes for this block number
+    * @return empty sequence if no hashes exist; otherwise sequence is not empty
+    */
+  def getHashes(blockNumber: Long): Future[Seq[HashedData]]
+
+  /**
+    * Insert an unmined block. The code containing the business logic may ensure that there's exactly one at any given
+    * time.
+    *
+    * @return info of the inserted block
+    */
+  def insertUnminedBlock(block: BlockInfo): Future[BlockInfo]
+
+  /**
+    * Update an existing block.
+    *
+    * @return
+    */
+  def updateBlock(block: BlockInfo): Future[BlockInfo]
+
+  /**
+    * Gives us the unmined block (has no block hash yet). At any given time exactly one unmined block exists.
     *
     * @return the unmined block
     */
