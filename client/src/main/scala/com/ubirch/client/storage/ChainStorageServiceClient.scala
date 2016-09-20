@@ -2,115 +2,84 @@ package com.ubirch.client.storage
 
 import com.typesafe.scalalogging.LazyLogging
 import com.ubirch.backend.chain.model._
-import com.ubirch.backend.storage.services.{ChainStorageElastic, ChainStorageNeo4J, ExplorerStorage, MinerStorage}
+import com.ubirch.backend.storage.services.{ChainStorageElastic, ChainStorageNeo4J}
 
 import scala.concurrent.Future
 
 /**
   * Created by derMicha on 13/08/16.
   */
-object ChainStorageServiceClient extends ExplorerStorage
-  with MinerStorage
-  with LazyLogging {
+object ChainStorageServiceClient extends LazyLogging {
 
   /*
    * MinerStorage methods
    **********************************/
 
   /**
-    * Adds a hash to the list of unmined hashes.
+    * Remember a hash to have it mined into a future block.
     *
     * @param hash the hash to store
+    * @return the stored hash; None if something went wrong
     */
-  override def storeHash(hash: HashedData): Future[Option[HashedData]] = ChainStorageNeo4J.storeHash(hash)
+  def minerStoreHash(hash: HashedData): Future[Option[HashedData]] = ChainStorageNeo4J.storeHash(hash)
 
   /**
-    * There's always exactly one unmined block which through mining becomes the newest block in the chain.
+    * Assign hashes to another block.
+    *
+    * @param hashes hashes to reassign
+    * @param newBlockNumber number block to assign hashes to
+    * @return sequence of reassigned hashes
+    */
+
+  def minerReassignHashes(hashes: Seq[HashedData], newBlockNumber: Long): Seq[HashedData] = ChainStorageNeo4J.reassignHashes(hashes, newBlockNumber)
+
+  /**
+    * Load all hashes for a given block number.
+    *
+    * @param blockNumber load hashes for this block number
+    * @return empty if no hashes exist; not empty otherwise
+    */
+  def minerGetHashes(blockNumber: Long): Future[Seq[HashedData]] = ChainStorageNeo4J.getHashes(blockNumber)
+
+  /**
+    * Insert a block. The code containing the business logic may ensure that there's exactly one at any given time.
+    *
+    * @return info of the inserted block; None if something went wrong
+    */
+  def minerInsertBlock(block: BlockInfo): Future[Option[BlockInfo]] = ChainStorageNeo4J.insertBlock(block)
+
+  /**
+    * Load a [[BlockInfo]] based on the block's number.
+    *
+    * @param blockNumber number of block to load
+    * @return None if block does not exist; Some otherwise
+    */
+  def minerGetBlock(blockNumber: Long): Future[Option[BlockInfo]] = ChainStorageNeo4J.getBlock(blockNumber)
+
+  /**
+    * Update an existing block.
+    *
+    * @return info of the updated blokck; None if something went wrong
+    */
+  def minerUpdateBlock(block: BlockInfo): Future[BlockInfo] = ChainStorageNeo4J.updateBlock(block)
+
+  /**
+    * Gives us the unmined block (has no block hash yet). At any given time exactly one unmined block may exist.
     *
     * @return the unmined block
     */
-  override def unminedBlock(): Future[BlockInfo] = ChainStorageNeo4J.unminedBlock()
-
-  // TODO method saving the genesis block
-
-  /**
-    * Insert an unmined block.
-    *
-    * @return BlockInfo of the inserted block
-    */
-  override def insertUnminedBlock(): Future[BlockInfo] = ChainStorageNeo4J.insertUnminedBlock()
+  def minerUnminedBlock(): Future[BlockInfo] = ChainStorageNeo4J.unminedBlock()
 
   /*
    * ExplorerStorage methods
    **********************************/
-
-  override def mostRecentBlock(): Future[Option[BlockInfo]] = ChainStorageElastic.mostRecentBlock()
-
-  /**
-    * Gives us basic information about a block (without all it's hashes).
-    *
-    * @param blockHash hash of the requested block
-    * @return block matching the input hash
-    */
-  override def getBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getBlockInfo(blockHash)
-
-  /**
-    * Gives us basic information about a block (without all it's hashes) based on the blockHash of it's predecessor.
-    *
-    * @param blockHash blockHash predecessor block
-    * @return block whose predecessor has the specified blockHash
-    */
-  override def getNextBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getNextBlockInfo(blockHash)
-
-  /**
-    * deletes a set of hash from the list of unmined hashes.
-    *
-    * @param hashes set of hashes to delete
-    */
-  override def deleteHashes(hashes: Set[String]): Future[Boolean] = ChainStorageElastic.deleteHashes(hashes)
-
-  override def saveGenesisBlock(genesis: GenesisBlock): Future[Option[GenesisBlock]] = ChainStorageElastic.saveGenesisBlock(genesis = genesis)
-
-  /**
-    * Gives us a block including all it's hashes.
-    *
-    * @param blockHash hash of the requested block
-    * @return block matching the input hash
-    */
-  override def getFullBlock(blockHash: String): Future[Option[FullBlock]] = ChainStorageElastic.getFullBlock(blockHash = blockHash)
 
   /**
     * Saves or updates a block.
     *
     * @param block block info to store
     */
-  override def upsertBlock(block: BlockInfo): Future[Option[BlockInfo]] = ChainStorageElastic.upsertBlock(block = block)
-
-  /**
-    * Saves or updates a block.
-    *
-    * @param fullBlock block info to store
-    */
-  override def upsertFullBlock(fullBlock: FullBlock): Future[Option[FullBlock]] = ChainStorageElastic.upsertFullBlock(fullBlock = fullBlock)
-
-  /**
-    * Gives us a list of hashes that haven't been mined yet.
-    *
-    * @return list of unmined hashes
-    */
-  override def unminedHashes(): Future[UnminedHashes] = ChainStorageElastic.unminedHashes()
-
-  /**
-    * @return the genesis block; None if none exists
-    */
-  override def getGenesisBlock: Future[Option[GenesisBlock]] = ChainStorageElastic.getGenesisBlock
-
-  /**
-    * deletes a hash from the list of unmined hashes.
-    *
-    * @param hash the hash to delete
-    */
-  override def deleteHash(hash: String): Future[Boolean] = ChainStorageElastic.deleteHash(hash = hash)
+  def explorerUpsertFullBlock(block: FullBlock): Future[Option[FullBlock]] = ChainStorageElastic.upsertFullBlock(block)
 
   /**
     * Gives us the block that the input hash is included in.
@@ -118,5 +87,30 @@ object ChainStorageServiceClient extends ExplorerStorage
     * @param eventHash hash based on which we look for the related block
     * @return block matching the input hash
     */
-  override def getBlockByEventHash(eventHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getBlockByEventHash(eventHash = eventHash)
+  def explorerGetBlockByEventHash(eventHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getBlockByEventHash(eventHash = eventHash)
+
+  /**
+    * Gives us basic information about a block (without all it's hashes).
+    *
+    * @param blockHash hash of the requested block
+    * @return block matching the input hash
+    */
+  def explorerGetBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getBlockInfo(blockHash)
+
+  /**
+    * Gives us a block including all it's hashes.
+    *
+    * @param blockHash hash of the requested block
+    * @return block matching the input hash
+    */
+  def explorerGetFullBlock(blockHash: String): Future[Option[FullBlock]] = ChainStorageElastic.getFullBlock(blockHash = blockHash)
+
+  /**
+    * Gives us basic information about a block (without all it's hashes) based on the blockHash of it's predecessor.
+    *
+    * @param blockHash blockHash predecessor block
+    * @return block whose predecessor has the specified blockHash
+    */
+  def explorerGetNextBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]] = ChainStorageElastic.getNextBlockInfo(blockHash)
+
 }

@@ -18,52 +18,25 @@ object ChainStorageElastic extends ExplorerStorage with LazyLogging {
 
   implicit val formats = DefaultFormats.lossless ++ org.json4s.ext.JodaTimeSerializers.all
 
-  def getHash(hash: String): Future[Option[HashedData]] = {
-    HashStore.fetch(hash).map {
-      case Some(hJval) =>
-        hJval.extractOpt[com.ubirch.backend.chain.model.HashedData] match {
-          case Some(hObj) =>
-            Some(hObj)
+  /**
+    * Saves or updates a block.
+    *
+    * @param block block info to store
+    */
+  override def upsertFullBlock(block: FullBlock): Future[Option[FullBlock]] =
+    Json4sUtil.any2jvalue(block) match {
+      case Some(jval) =>
+        BlockStore.store(block.hash, jval).map {
+          case Some(bi) =>
+            //@TODO add deeper result check
+            Some(block)
           case None =>
             None
         }
-      case _ => None
-    }
-  }
-
-  override def deleteHash(hash: String): Future[Boolean] = {
-    HashStore.delete(hash)
-  }
-
-  override def deleteHashes(hashes: Set[String]): Future[Boolean] = {
-    hashes.foreach(deleteHash)
-    //@TODO fix it, return false if one the results are false
-    Future(true)
-  }
-
-  /**
-    * Gives us a list of hashes that haven't been mined yet.
-    *
-    * @return list of unmined hashes
-    */
-  override def unminedHashes(): Future[UnminedHashes] = {
-    Thread.sleep(500)
-
-    val limit = ServerConfig.esUnminedHashesLimit
-    HashStore.fetchAll(limit = limit).map {
-      case Some(jvals) =>
-        UnminedHashes(jvals.map { jval =>
-          jval.extractOpt[HashedData] match {
-            case Some(hash) =>
-              Some(hash.hash)
-            case None =>
-              None
-          }
-        }.filter(_.isDefined).map(_.get))
       case None =>
-        UnminedHashes(Seq.empty)
+        logger.error(s"could not store FullBlock: $block")
+        Future(None)
     }
-  }
 
   /**
     * Gives us the block that the input hash is included in.
@@ -135,85 +108,6 @@ object ChainStorageElastic extends ExplorerStorage with LazyLogging {
         bJval.extractOpt[FullBlock]
       case _ => None
     }
-  }
-
-  override def mostRecentBlock(): Future[Option[BlockInfo]] = {
-    BlockStore.fetchAll(sortedBy = Some("number"), order = "desc", limit = 1).map {
-      case Some(jvals: List[JValue]) =>
-        jvals.nonEmpty match {
-          case true => jvals.head.extractOpt[BlockInfo]
-          case false => None
-        }
-      case None =>
-        None
-    }
-  }
-
-  override def saveGenesisBlock(genesis: GenesisBlock): Future[Option[GenesisBlock]] = {
-    Json4sUtil.any2jvalue(genesis) match {
-      case Some(genesisJval) =>
-        GenesisBlockStore.store("1", genesisJval).map {
-          case Some(bi) =>
-            //@TODO add deeper result check
-            Some(genesis)
-          case None =>
-            None
-        }
-      case None =>
-        logger.error(s"got invalid GenesisBlock: $genesis")
-        Future(None)
-    }
-  }
-
-  /**
-    * Saves or updates a block.
-    *
-    * @param block block info to store
-    */
-  override def upsertBlock(block: BlockInfo): Future[Option[BlockInfo]] =
-  Json4sUtil.any2jvalue(block) match {
-    case Some(jval) =>
-      BlockStore.store(block.hash, jval).map {
-        case Some(bi) =>
-          //@TODO add deeper result check
-          Some(block)
-        case None =>
-          None
-      }
-    case None =>
-      logger.error(s"could not store BlockInfo: $block")
-      Future(None)
-  }
-
-  /**
-    * Saves or updates a block.
-    *
-    * @param fullBlock block info to store
-    */
-  override def upsertFullBlock(fullBlock: FullBlock): Future[Option[FullBlock]] =
-  Json4sUtil.any2jvalue(fullBlock) match {
-    case Some(jval) =>
-      BlockStore.store(fullBlock.hash, jval).map {
-        case Some(bi) =>
-          //@TODO add deeper result check
-          Some(fullBlock)
-        case None =>
-          None
-      }
-    case None =>
-      logger.error(s"could not store BlockInfo: $fullBlock")
-      Future(None)
-  }
-
-  /**
-    * @return the genesis block; None if none exists
-    */
-  override def getGenesisBlock: Future[Option[GenesisBlock]] =
-  GenesisBlockStore.fetch("1") map {
-    case Some(bJval) =>
-      bJval.extractOpt[GenesisBlock]
-    case None =>
-      None
   }
 
 }

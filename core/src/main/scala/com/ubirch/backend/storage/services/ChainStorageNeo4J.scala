@@ -12,21 +12,55 @@ import scala.concurrent.Future
 object ChainStorageNeo4J extends MinerStorage with LazyLogging {
 
   /**
-    * Adds a hash to the list of unmined hashes.
+    * Add a hash and assign it to the [[unminedBlock()]].
     *
     * @param hash the hash to store
+    * @return the stored hash; None if something went wrong
     */
   override def storeHash(hash: HashedData): Future[Option[HashedData]] = ??? // TODO implement
 
   /**
-    * Insert an unmined block.
+    * Assign hashes to another block.
     *
-    * @return BlockInfo of the inserted block
+    * @param hashes hashes to reassign
+    * @param newBlockNumber number block to assign hashes to
+    * @return sequence of reassigned hashes
     */
-  override def insertUnminedBlock(): Future[BlockInfo] = ??? // TODO implement
+
+  override def reassignHashes(hashes: Seq[HashedData], newBlockNumber: Long): Seq[HashedData] = ??? // TODO implement
 
   /**
-    * There's always exactly one unmined block which through mining becomes the newest block in the chain.
+    * Load all hashes for a given block number.
+    *
+    * @param blockNumber load hashes for this block number
+    * @return empty if no hashes exist; not empty otherwise
+    */
+  override def getHashes(blockNumber: Long): Future[Seq[HashedData]] = ??? // TODO implement
+
+  /**
+    * Insert a block. The code containing the business logic may ensure that there's exactly one at any given time.
+    *
+    * @return info of the inserted block; None if something went wrong
+    */
+  override def insertBlock(block: BlockInfo): Future[Option[BlockInfo]] = ??? // TODO implement
+
+  /**
+    * Load a [[BlockInfo]] based on the block's number.
+    *
+    * @param blockNumber number of block to load
+    * @return None if block does not exist; Some otherwise
+    */
+  override def getBlock(blockNumber: Long): Future[Option[BlockInfo]] = ??? // TODO implement
+
+  /**
+    * Update an existing block.
+    *
+    * @return info of the updated blokck; None if something went wrong
+    */
+  override def updateBlock(block: BlockInfo): Future[BlockInfo] = ??? // TODO implement
+
+  /**
+    * Gives us the unmined block (has no block hash yet). At any given time exactly one unmined block may exist.
     *
     * @return the unmined block
     */

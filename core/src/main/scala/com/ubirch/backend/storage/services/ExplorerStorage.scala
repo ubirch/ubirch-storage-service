@@ -12,18 +12,11 @@ import scala.concurrent.Future
 trait ExplorerStorage extends LazyLogging {
 
   /**
-    * deletes a hash from the list of unmined hashes.
     *
-    * @param hash the hash to delete
+    * @param fullBlock a block with event hashes
+    * @return
     */
-  def deleteHash(hash: String): Future[Boolean]
-
-  /**
-    * deletes a set of hash from the list of unmined hashes.
-    *
-    * @param hash set of hashes to delete
-    */
-  def deleteHashes(hash: Set[String]): Future[Boolean]
+  def upsertFullBlock(fullBlock: FullBlock): Future[Option[FullBlock]]
 
   /**
     * Gives us the block that the input hash is included in.
@@ -42,14 +35,6 @@ trait ExplorerStorage extends LazyLogging {
   def getBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]]
 
   /**
-    * Gives us basic information about a block (without all it's hashes) based on the blockHash of it's predecessor.
-    *
-    * @param blockHash blockHash predecessor block
-    * @return block whose predecessor has the specified blockHash
-    */
-  def getNextBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]]
-
-  /**
     * Gives us a block including all it's hashes.
     *
     * @param hash hash of the requested block
@@ -58,33 +43,11 @@ trait ExplorerStorage extends LazyLogging {
   def getFullBlock(hash: String): Future[Option[FullBlock]]
 
   /**
-    * Gives us a list of hashes that haven't been mined yet.
+    * Gives us basic information about a block (without all it's hashes) based on the blockHash of it's predecessor.
     *
-    * @return list of unmined hashes
+    * @param blockHash blockHash predecessor block
+    * @return block whose predecessor has the specified blockHash
     */
-  def unminedHashes(): Future[UnminedHashes]
-
-  /**
-    * Saves or updates a block.
-    *
-    * @param block block info to store
-    */
-  def upsertBlock(block: BlockInfo): Future[Option[BlockInfo]]
-
-  /**
-    *
-    * @param fullBlock a block with event hashes
-    * @return
-    */
-  def upsertFullBlock(fullBlock: FullBlock): Future[Option[FullBlock]]
-
-  def mostRecentBlock(): Future[Option[BlockInfo]]
-
-  def saveGenesisBlock(genesis: GenesisBlock): Future[Option[GenesisBlock]]
-
-  /**
-    * @return the genesis block; None if none exists
-    */
-  def getGenesisBlock: Future[Option[GenesisBlock]]
+  def getNextBlockInfo(blockHash: HashedData): Future[Option[BlockInfo]]
 
 }

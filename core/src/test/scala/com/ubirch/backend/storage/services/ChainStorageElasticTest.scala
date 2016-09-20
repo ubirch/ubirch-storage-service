@@ -2,7 +2,7 @@ package com.ubirch.backend.storage.services
 
 import com.roundeights.hasher.Implicits._
 import com.typesafe.scalalogging.LazyLogging
-import com.ubirch.backend.chain.model.{BlockInfo, FullBlock, GenesisBlock, HashedData}
+import com.ubirch.backend.chain.model.{BlockInfo, FullBlock, HashedData}
 import com.ubirch.backend.storage.StorageCleanUp
 import com.ubirch.util.date.DateUtil
 import com.ubirch.util.uuid.UUIDUtil
@@ -76,59 +76,6 @@ class ChainStorageElasticTest extends FeatureSpec
 
   feature("ChainStoreES") {
 
-    // TODO move to ChainStorageNeo4JTest
-//    scenario("store a hash") {
-//      val res = Await.result(ChainStorageElastic.storeHash(hashValue), 10 seconds)
-//      res shouldBe 'isDefined
-//      res.get.hash shouldBe hashValue.hash
-//    }
-
-    scenario("fetch a hash") {
-      val fetchedHash = Await.result(ChainStorageElastic.getHash(hashValue.hash), 10 seconds)
-      fetchedHash shouldBe 'isDefined
-      fetchedHash.get.hash shouldBe hashValue.hash
-    }
-
-    scenario("delete hashes") {
-
-      hashValues.foreach { hash =>
-        val hv = Await.result(ChainStorageElastic.getHash(hash), 10 seconds)
-        hv shouldBe 'isDefined
-        hv.get.hash shouldBe hash
-      }
-
-      ChainStorageElastic.deleteHashes(hashValues.toSet)
-
-      Thread.sleep(500)
-
-      hashValues.foreach { hash =>
-        val hv = Await.result(ChainStorageElastic.getHash(hash), 10 seconds)
-        hv shouldBe 'isEmpty
-      }
-    }
-
-    scenario("fetch unminded hashes") {
-      Thread.sleep(500)
-      val unminedHashes = Await.result(ChainStorageElastic.unminedHashes(), 10 seconds)
-      unminedHashes.hashes shouldBe 'nonEmpty
-      unminedHashes.hashes.head shouldBe hashValue.hash
-    }
-
-    scenario("delete a hash") {
-      val res = Await.result(ChainStorageElastic.deleteHash(hashValue.hash), 10 seconds)
-      res shouldBe true
-
-      val fetchedHash = Await.result(ChainStorageElastic.getHash(hashValue.hash), 10 seconds)
-      fetchedHash shouldBe 'isEmpty
-    }
-
-    scenario("store a BlockInfo") {
-
-      val res = Await.result(ChainStorageElastic.upsertBlock(block = blockInfo1), 10 seconds)
-      res shouldBe 'isDefined
-      res.get.hash shouldBe blockInfo1.hash
-    }
-
     scenario("get a BlockInfo") {
 
       val res = Await.result(ChainStorageElastic.getBlockInfo(blockHash = blockHash1), 10 seconds)
@@ -138,7 +85,7 @@ class ChainStorageElasticTest extends FeatureSpec
 
     scenario("store a 2nd BlockInfo") {
 
-      val res = Await.result(ChainStorageElastic.upsertBlock(block = blockInfo2), 10 seconds)
+      val res = Await.result(ChainStorageElastic.upsertFullBlock(block = fullBlockInfo2), 10 seconds)
       res shouldBe 'isDefined
       res.get.hash shouldBe blockInfo2.hash
     }
@@ -164,30 +111,6 @@ class ChainStorageElasticTest extends FeatureSpec
       res shouldBe 'isDefined
       res.get.hash shouldBe blockHash1.hash
 
-    }
-    scenario("load most recent BlockInfo") {
-
-      Thread.sleep(1000)
-
-      val res = Await.result(ChainStorageElastic.mostRecentBlock(), 10 seconds)
-      res shouldBe 'isDefined
-      res.get.hash shouldBe blockHash2.hash
-    }
-
-    scenario("save a GenesisBlock") {
-      val genesisBlock = GenesisBlock(
-        hash = genesisBlockHash
-      )
-
-      val res = Await.result(ChainStorageElastic.saveGenesisBlock(genesis = genesisBlock), 10 seconds)
-      res shouldBe 'isDefined
-      res.get.hash shouldBe genesisBlock.hash
-    }
-
-    scenario("load a GenesisBlock") {
-      val res = Await.result(ChainStorageElastic.getGenesisBlock, 10 seconds)
-      res shouldBe 'isDefined
-      res.get.hash shouldBe genesisBlockHash
     }
 
     scenario("get next BlockInfo (block does not exist though)") {
@@ -215,7 +138,7 @@ class ChainStorageElasticTest extends FeatureSpec
     hashValues.foreach { hv =>
       val hash = HashedData(hv)
       // TODO update test tooling
-//      Await.result(ChainStorageElastic.storeHash(hash), 10 seconds)
+      //      Await.result(ChainStorageElastic.storeHash(hash), 10 seconds)
     }
 
   }
