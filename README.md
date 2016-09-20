@@ -10,7 +10,7 @@ ubirch generic storage service
 	  Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
 	)
     libraryDependencies ++= Seq(
-      "com.ubirch.backend.storage" %% "client" % "0.0.1-SNAPSHOT"
+      "com.ubirch.backend.storage" %% "client" % "0.1.0-SNAPSHOT"
     )
 
 ### `core`
@@ -21,7 +21,7 @@ ubirch generic storage service
 	  Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
 	)
     libraryDependencies ++= Seq(
-      "com.ubirch.backend.storage" %% "core" % "0.0.1-SNAPSHOT"
+      "com.ubirch.backend.storage" %% "core" % "0.1.0-SNAPSHOT"
     )
 
 ### `model`
@@ -30,7 +30,7 @@ ubirch generic storage service
 	  Resolver.sonatypeRepo("snapshots")
 	)
     libraryDependencies ++= Seq(
-      "com.ubirch.backend.storage" %% "model" % "0.0.1-SNAPSHOT"
+      "com.ubirch.backend.storage" %% "model" % "0.1.0-SNAPSHOT"
     )
 
 ### `share`
@@ -40,7 +40,7 @@ ubirch generic storage service
 	  "RoundEights" at "http://maven.spikemark.net/roundeights" // Hasher
 	)
     libraryDependencies ++= Seq(
-      "com.ubirch.backend.storage" %% "share" % "0.0.1-SNAPSHOT"
+      "com.ubirch.backend.storage" %% "share" % "0.1.0-SNAPSHOT"
     )
 
 ### `test-util`
@@ -50,7 +50,7 @@ ubirch generic storage service
 	  Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
 	)
     libraryDependencies ++= Seq(
-      "com.ubirch.backend.storage" %% "test-util" % "0.0.1-SNAPSHOT"
+      "com.ubirch.backend.storage" %% "test-util" % "0.1.0-SNAPSHOT"
     )
 
 ### `ubirch-share`
@@ -60,7 +60,7 @@ ubirch generic storage service
 	  Resolver.bintrayRepo("rick-beton", "maven") // BeeClient
 	)
     libraryDependencies ++= Seq(
-      "com.ubirch.backend.storage" %% "ubirch-share" % "0.0.1-SNAPSHOT"
+      "com.ubirch.backend.storage" %% "ubirch-share" % "0.1.0-SNAPSHOT"
     )
 
 ### `server`
@@ -69,7 +69,7 @@ ubirch generic storage service
 	  Resolver.sonatypeRepo("snapshots")
 	)
     libraryDependencies ++= Seq(
-      "com.ubirch.backend.storage" %% "server" % "0.0.1-SNAPSHOT"
+      "com.ubirch.backend.storage" %% "server" % "0.1.0-SNAPSHOT"
     )
 
 ## client usage
