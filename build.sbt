@@ -20,7 +20,7 @@ lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("t
 
 lazy val commonSettings = Seq(
   organization := "com.ubirch.backend.storage",
-  version := "0.1.0-SNAPSHOT",
+  version := "0.0.1",
   test in assembly := {},
   parallelExecution in ThisBuild := false,
   javaOptions in Test += testConfiguration,
@@ -195,13 +195,13 @@ lazy val jodaConvert = "org.joda" % "joda-convert" % "1.8"
 lazy val typesafeConfig = "com.typesafe" % "config" % configV
 
 lazy val ubirchUtilsDependencies = Seq(
-  "com.ubirch.util" %% "crypto" % "0.2-SNAPSHOT"
+  "com.ubirch.util" %% "crypto" % "0.2"
 )
 
-lazy val ubirchUtilDate = "com.ubirch.util" %% "date" % "0.1-SNAPSHOT"
-lazy val ubirchUtilJson = "com.ubirch.util" %% "json" % "0.1-SNAPSHOT"
-lazy val ubirchUtilJsonAutoConvert = "com.ubirch.util" %% "json-auto-convert" % "0.1-SNAPSHOT"
-lazy val ubirchUtilUUID = "com.ubirch.util" %% "uuid" % "0.1-SNAPSHOT"
+lazy val ubirchUtilDate = "com.ubirch.util" %% "date" % "0.1"
+lazy val ubirchUtilJson = "com.ubirch.util" %% "json" % "0.1"
+lazy val ubirchUtilJsonAutoConvert = "com.ubirch.util" %% "json-auto-convert" % "0.1"
+lazy val ubirchUtilUUID = "com.ubirch.util" %% "uuid" % "0.1"
 
 lazy val resolverHasher = "RoundEights" at "http://maven.spikemark.net/roundeights"
 lazy val resolverBeeClient = Resolver.bintrayRepo("rick-beton", "maven")
