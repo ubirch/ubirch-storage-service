@@ -15,7 +15,7 @@ lazy val commonSettings = Seq(
     //  Opts.resolver.sonatypeReleases // ubirch
   ),
 
-  version := "0.0.1",
+  version := "0.1.0-SNAPSHOT",
   organization := "com.ubirch.backend.storage",
 
   homepage := Some(url("http://ubirch.com")),
