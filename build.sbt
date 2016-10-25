@@ -3,24 +3,27 @@ import sbt.Resolver
 
 packagedArtifacts in file(".") := Map.empty // disable publishing of root/default project
 
-scalaVersion in ThisBuild := "2.11.8"
-
-//maintainer := "Michael Merz <dermicha@ubirch.com>"
-
-name := "ubirch-storage-service"
-
-homepage := Some(url("http://ubirch.com"))
-
-resolvers in ThisBuild ++= Seq(
-  Opts.resolver.sonatypeSnapshots // ubirch
-  //  Opts.resolver.sonatypeReleases // ubirch
-)
-
 lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.dev.conf")
 
 lazy val commonSettings = Seq(
-  organization := "com.ubirch.backend.storage",
+
+  scalaVersion in ThisBuild := "2.11.8",
+  //maintainer := "Michael Merz <dermicha@ubirch.com>",
+
+  resolvers in ThisBuild ++= Seq(
+    Opts.resolver.sonatypeSnapshots // ubirch
+    //  Opts.resolver.sonatypeReleases // ubirch
+  ),
+
   version := "0.0.1",
+  organization := "com.ubirch.backend.storage",
+
+  homepage := Some(url("http://ubirch.com")),
+  scmInfo := Some(ScmInfo(url(
+    "https://github.com/ubirch/ubirch-storage-service"),
+    "scm:git:git@github.com:ubirch/ubirch-storage-service.git"
+  )),
+
   test in assembly := {},
   parallelExecution in ThisBuild := false,
   javaOptions in Test += testConfiguration,
@@ -31,6 +34,7 @@ lazy val commonSettings = Seq(
     Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports"),
     Tests.Argument(TestFrameworks.ScalaTest, "-o")
   )
+
 )
 
 lazy val ubirchShare = (project in file("ubirch-share"))
@@ -38,43 +42,58 @@ lazy val ubirchShare = (project in file("ubirch-share"))
   .dependsOn(model)
   .settings(libraryDependencies ++= commonDependencies ++ mqttDependencies ++ json4s ++ testDependencies
     :+ typesafeConfig :+ ubirchUtilUUID :+ ubirchUtilJson :+ hasher % "test" :+ beeClient % "test" :+ ubirchUtilDate % "test")
-  .settings(resolvers ++= Seq(
-    resolverHasher,
-    resolverBeeClient
-  ))
+  .settings(
+    name := "ubirch-share",
+    description := "shared code (should probably extracted to ubirch-scala-utils)",
+    resolvers ++= Seq(
+      resolverHasher,
+      resolverBeeClient
+    )
+  )
 
 lazy val config = (project in file("config"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies)
+  .settings(
+    description := "configuration",
+    libraryDependencies ++= commonDependencies
+  )
 
 lazy val model = (project in file("model"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ joda ++ testDependencies :+ ubirchUtilDate)
+  .settings(
+    description := "data models",
+    libraryDependencies ++= commonDependencies ++ joda ++ testDependencies :+ ubirchUtilDate
+  )
 
 lazy val share = (project in file("share"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ testDependencies :+ ubirchUtilDate)
-  .dependsOn(ubirchShare)
-  .dependsOn(config)
-  .dependsOn(model)
+  .dependsOn(ubirchShare, config, model)
+  .settings(
+    description := "shared code",
+    libraryDependencies ++= commonDependencies ++ testDependencies :+ ubirchUtilDate
+  )
 
 lazy val core = (project in file("core"))
   .settings(commonSettings: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies
-    :+ hasher % "test" :+ ubirchUtilDate)
-  .settings(resolvers ++= Seq(
-    resolverHasher,
-    resolverBeeClient
-  ))
-  .dependsOn(share)
-  .dependsOn(model)
-  .dependsOn(ubirchShare)
-  .dependsOn(testUtil)
+  .dependsOn(share, model, ubirchShare, testUtil)
+  .settings(
+    description := "business logic",
+    libraryDependencies ++= commonDependencies ++ akkaDependencies ++ apacheHttpDependencies ++ testDependencies
+      :+ hasher % "test" :+ ubirchUtilDate,
+    resolvers ++= Seq(
+      resolverHasher,
+      resolverBeeClient
+    )
+  )
 
 lazy val server = (project in file("server"))
   .enablePlugins(DockerPlugin)
   .settings(commonSettings: _*)
+  .settings(mergeStrategy: _*)
+  .dependsOn(share, core, model)
   .settings(
+    description := "server specific code",
+    libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies :+ ubirchUtilJsonAutoConvert,
     dockerfile in docker := {
       // The assembly task generates a fat JAR file
       val artifact: File = assembly.value
@@ -87,30 +106,26 @@ lazy val server = (project in file("server"))
       }
     }
   )
-  .settings(mergeStrategy: _*)
-  .settings(libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies :+ ubirchUtilJsonAutoConvert)
-  .dependsOn(share)
-  .dependsOn(core)
-  .dependsOn(model)
 
 lazy val client = (project in file("client"))
   .settings(commonSettings: _*)
-  .settings(scmInfo := Some(ScmInfo(url("https://github.com/ubirch/ubirch-storage-service"), "git@github.com:ubirch/ubirch-storage-service.git")))
-  .settings(libraryDependencies := commonDependencies ++ joda ++ akkaHttpDependencies ++ testDependencies)
-  .dependsOn(share)
-  .dependsOn(core)
-  .dependsOn(model)
+  .dependsOn(share, core, model)
+  .settings(
+    description := "client code",
+    libraryDependencies := commonDependencies ++ joda ++ akkaHttpDependencies ++ testDependencies
+  )
 
 lazy val testUtil = (project in file("test-util"))
   .settings(commonSettings: _*)
+  .dependsOn(share)
   .settings(
     name := "test-util",
+    description := "test specific code",
     libraryDependencies ++= Seq(typesafeLogging) :+ beeClient,
     resolvers ++= Seq(
       resolverBeeClient
     )
   )
-  .dependsOn(share)
 
 val scalaV = "2.11.8"
 val akkaV = "2.4.8"
