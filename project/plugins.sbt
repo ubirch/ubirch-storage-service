@@ -1,6 +1,7 @@
 logLevel := Level.Warn
 
-//resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
+resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
+
 //libraryDependencies += "com.spotify" % "docker-client" % "3.5.13"
 
 //addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "1.1.4")
@@ -11,6 +12,8 @@ logLevel := Level.Warn
 
 //lazy val plugin = file("../").getCanonicalFile.toURI
 
-addSbtPlugin("se.marcuslonnberg" % "sbt-docker" % "1.4.0")
+//addSbtPlugin("se.marcuslonnberg" % "sbt-docker" % "1.4.0")
 
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.8.2")
+
+addSbtPlugin("com.typesafe.sbt" % "sbt-twirl" % "1.1.1")

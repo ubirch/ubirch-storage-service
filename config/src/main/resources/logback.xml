@@ -4,11 +4,13 @@
         <!-- encoders are assigned the type
              ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%date{ISO8601} %-5level - %msg -[%logger{36}] - [%thread]%n</pattern>
         </encoder>
     </appender>
 
-    <root level="debug">
+    <logger name="com.ubirch" level="DEBUG"/>
+
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>

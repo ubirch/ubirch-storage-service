@@ -1,22 +1,17 @@
-import sbt.Keys._
-import sbt.Resolver
-
 packagedArtifacts in file(".") := Map.empty // disable publishing of root/default project
 
-lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.dev.conf")
+//lazy val testConfiguration = "-Dconfig.resource=" + Option(System.getProperty("test.config")).getOrElse("application.dev.conf")
+
+// see http://www.scala-sbt.org/0.13/docs/Parallel-Execution.html for details
+concurrentRestrictions in Global := Seq(
+  Tags.limit(Tags.Test, 1)
+)
 
 lazy val commonSettings = Seq(
 
   scalaVersion in ThisBuild := "2.11.8",
-  //maintainer := "Michael Merz <dermicha@ubirch.com>",
-
-  resolvers in ThisBuild ++= Seq(
-    Opts.resolver.sonatypeSnapshots // ubirch
-    //  Opts.resolver.sonatypeReleases // ubirch
-  ),
-
-  version := "0.0.1",
-  organization := "com.ubirch.backend.storage",
+  scalacOptions ++= Seq("-feature"),
+  organization := "com.ubirch.storage",
 
   homepage := Some(url("http://ubirch.com")),
   scmInfo := Some(ScmInfo(url(
@@ -24,18 +19,19 @@ lazy val commonSettings = Seq(
     "scm:git:git@github.com:ubirch/ubirch-storage-service.git"
   )),
 
-  test in assembly := {},
-  parallelExecution in ThisBuild := false,
-  javaOptions in Test += testConfiguration,
-  fork in Test := true,
-  updateOptions := updateOptions.value.withLatestSnapshots(false),
-  // in ThisBuild is important to run tests of each subproject sequential instead parallelizing them
-  testOptions in ThisBuild ++= Seq(
-    Tests.Argument(TestFrameworks.ScalaTest, "-u", "target/test-reports"),
-    Tests.Argument(TestFrameworks.ScalaTest, "-o")
-  )
+  version := "0.0.1",
 
+  test in assembly := {},
+  resolvers ++= Seq(
+    Resolver.sonatypeRepo("releases"),
+    Resolver.sonatypeRepo("snapshots"),
+    resolverHasher,
+    resolverBeeClient
+  )
 )
+
+lazy val resolverHasher = "RoundEights" at "http://maven.spikemark.net/roundeights"
+lazy val resolverBeeClient = Resolver.bintrayRepo("rick-beton", "maven")
 
 lazy val ubirchShare = (project in file("ubirch-share"))
   .settings(commonSettings: _*)
@@ -87,24 +83,12 @@ lazy val core = (project in file("core"))
   )
 
 lazy val server = (project in file("server"))
-  .enablePlugins(DockerPlugin)
   .settings(commonSettings: _*)
   .settings(mergeStrategy: _*)
   .dependsOn(share, core, model)
   .settings(
     description := "server specific code",
-    libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies :+ ubirchUtilJsonAutoConvert,
-    dockerfile in docker := {
-      // The assembly task generates a fat JAR file
-      val artifact: File = assembly.value
-      val artifactTargetPath = s"/app/${artifact.name}"
-
-      new Dockerfile {
-        from("ubirch/java")
-        add(artifact, artifactTargetPath)
-        entryPoint("java", "-jar", artifactTargetPath, "-D")
-      }
-    }
+    libraryDependencies ++= commonDependencies ++ akkaHttpDependencies ++ testDependencies :+ ubirchUtilJsonAutoConvert
   )
 
 lazy val client = (project in file("client"))
@@ -206,7 +190,6 @@ lazy val json4sNative = "org.json4s" %% "json4s-native" % json4sV
 lazy val joda = Seq(jodaTime, jodaConvert)
 lazy val jodaTime = "joda-time" % "joda-time" % "2.9.4"
 lazy val jodaConvert = "org.joda" % "joda-convert" % "1.8"
-
 lazy val typesafeConfig = "com.typesafe" % "config" % configV
 
 lazy val ubirchUtilsDependencies = Seq(
@@ -218,9 +201,6 @@ lazy val ubirchUtilJson = "com.ubirch.util" %% "json" % "0.1"
 lazy val ubirchUtilJsonAutoConvert = "com.ubirch.util" %% "json-auto-convert" % "0.1"
 lazy val ubirchUtilUUID = "com.ubirch.util" %% "uuid" % "0.1"
 
-lazy val resolverHasher = "RoundEights" at "http://maven.spikemark.net/roundeights"
-lazy val resolverBeeClient = Resolver.bintrayRepo("rick-beton", "maven")
-
 lazy val mergeStrategy = Seq(
   assemblyMergeStrategy in assembly := {
     case PathList("org", "joda", "time", xs@_*) => MergeStrategy.first
@@ -229,6 +209,7 @@ lazy val mergeStrategy = Seq(
     case m if m.toLowerCase.endsWith("application.conf") => MergeStrategy.concat
     case m if m.toLowerCase.endsWith("application.dev.conf") => MergeStrategy.first
     case m if m.toLowerCase.endsWith("application.base.conf") => MergeStrategy.first
+    case m if m.toLowerCase.endsWith("logback.xml") => MergeStrategy.first
     case "reference.conf" => MergeStrategy.concat
     case _ => MergeStrategy.first
   }
