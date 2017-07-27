@@ -1,6 +1,8 @@
 # ubirch-storage-service
 ubirch generic storage service 
 
+*!!! project is deprecated and might be deleted at any time !!!*
+
 ## Scala Dependencies
 
 ### `client`
